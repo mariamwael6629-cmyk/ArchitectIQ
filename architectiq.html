@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArchitectIQ – System Design Learning Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══ TOKENS ═══════════════════════════════════════════════════════════════ */
+:root {
+  --bg:#060a12; --bg2:#0b1120; --bg3:#0f1828; --bg4:#141f30; --bg5:#1a2840;
+  --glass:rgba(15,24,40,0.75); --glass2:rgba(20,32,52,0.55);
+  --border:rgba(99,180,255,0.10); --border2:rgba(99,180,255,0.22);
+  --accent:#3b82f6; --accent2:#60a5fa; --accent3:#93c5fd;
+  --cyan:#06b6d4; --em:#10b981; --am:#f59e0b; --rose:#f43f5e; --violet:#8b5cf6;
+  --text:#e2eaf6; --text2:#94a3b8; --text3:#475569;
+  --fd:'Syne',sans-serif; --fb:'DM Sans',sans-serif; --fm:'DM Mono',monospace;
+  --r8:8px; --r12:12px; --r16:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14.5px;line-height:1.65;overflow-x:hidden;}
+::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-track{background:var(--bg);} ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+button,input,textarea,select{font-family:var(--fb);}
+
+/* ═══ NAV ═══════════════════════════════════════════════════════════════════ */
+#nav{position:fixed;top:0;left:0;right:0;z-index:200;height:58px;display:flex;align-items:center;padding:0 1.5rem;gap:.5rem;background:rgba(6,10,18,0.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);}
+.nav-brand{font-family:var(--fd);font-weight:800;font-size:1.15rem;cursor:pointer;color:#fff;margin-right:.5rem;}
+.nav-brand b{background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.nav-link{color:var(--text2);font-size:12.5px;font-weight:500;padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .18s;white-space:nowrap;border:none;background:none;}
+.nav-link:hover,.nav-link.on{color:var(--text);background:var(--border);}
+.nav-spacer{flex:1;}
+.nav-cta{background:var(--accent);color:#fff;font-size:12.5px;font-weight:600;padding:6px 15px;border-radius:7px;cursor:pointer;border:none;transition:all .18s;}
+.nav-cta:hover{background:#2563eb;transform:translateY(-1px);}
+.nav-mobile{display:none;background:none;border:none;color:var(--text2);font-size:1.3rem;cursor:pointer;padding:4px 8px;}
+
+/* ═══ PAGE SYSTEM ════════════════════════════════════════════════════════════ */
+.pg{display:none;min-height:100vh;padding-top:58px;}
+.pg.on{display:block;}
+.wrap{max-width:1180px;margin:0 auto;padding:2.5rem 1.5rem;}
+.pg-label{font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent2);margin-bottom:.35rem;}
+.pg-title{font-family:var(--fd);font-size:1.9rem;font-weight:800;color:#fff;margin-bottom:.55rem;line-height:1.15;}
+.pg-sub{font-size:.92rem;color:var(--text2);max-width:540px;line-height:1.75;}
+.sect-title{font-family:var(--fd);font-size:1.35rem;font-weight:800;color:#fff;margin-bottom:1rem;}
+
+/* ═══ BUTTONS ════════════════════════════════════════════════════════════════ */
+.btn{border:none;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:6px;font-weight:600;}
+.btn-p{background:var(--accent);color:#fff;padding:11px 24px;border-radius:var(--r8);font-size:13.5px;}
+.btn-p:hover{background:#2563eb;transform:translateY(-1px);box-shadow:0 8px 28px rgba(59,130,246,.4);}
+.btn-s{background:transparent;color:var(--text);border:1px solid var(--border2);padding:11px 24px;border-radius:var(--r8);font-size:13.5px;}
+.btn-s:hover{background:var(--glass);border-color:var(--accent2);}
+.btn-sm{background:var(--bg4);border:1px solid var(--border);color:var(--text2);padding:5px 11px;border-radius:6px;font-size:12px;}
+.btn-sm:hover{background:var(--bg5);color:var(--text);}
+.btn-danger{background:rgba(244,63,94,.12);border:1px solid rgba(244,63,94,.25);color:var(--rose);padding:5px 11px;border-radius:6px;font-size:12px;}
+
+/* ═══ CARDS ══════════════════════════════════════════════════════════════════ */
+.card{background:var(--glass2);border:1px solid var(--border);border-radius:var(--r12);padding:1.35rem;transition:all .25s;cursor:pointer;position:relative;overflow:hidden;}
+.card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(59,130,246,.04));opacity:0;transition:opacity .25s;pointer-events:none;}
+.card:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:0 16px 48px rgba(0,0,0,.45);}
+.card:hover::after{opacity:1;}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:1.15rem;margin-top:1.75rem;}
+
+/* Tags */
+.tag{display:inline-flex;align-items:center;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:100px;margin-bottom:.85rem;}
+.t-b{background:rgba(16,185,129,.14);color:var(--em);border:1px solid rgba(16,185,129,.22);}
+.t-i{background:rgba(245,158,11,.14);color:var(--am);border:1px solid rgba(245,158,11,.22);}
+.t-a{background:rgba(244,63,94,.14);color:var(--rose);border:1px solid rgba(244,63,94,.22);}
+.t-e{background:rgba(139,92,246,.14);color:var(--violet);border:1px solid rgba(139,92,246,.22);}
+
+/* ═══ HERO PAGE ══════════════════════════════════════════════════════════════ */
+.hero-outer{position:relative;overflow:hidden;}
+.hero-radial{position:absolute;inset:0;background:radial-gradient(ellipse 75% 55% at 50% -5%,rgba(59,130,246,.16),transparent 70%),radial-gradient(ellipse 45% 35% at 82% 48%,rgba(6,182,212,.09),transparent 60%);pointer-events:none;}
+.grid-lines{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:58px 58px;opacity:.38;pointer-events:none;}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:3.5rem;align-items:center;position:relative;z-index:1;padding:4.5rem 0 2rem;}
+.hero-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(59,130,246,.09);border:1px solid rgba(59,130,246,.28);border-radius:100px;padding:4px 13px 4px 7px;font-size:11px;color:var(--accent3);margin-bottom:1.2rem;}
+.hero-badge span{background:var(--accent);color:#fff;border-radius:100px;padding:2px 8px;font-size:10px;font-weight:700;}
+.hero-h1{font-family:var(--fd);font-size:3rem;font-weight:800;line-height:1.08;color:#fff;margin-bottom:.85rem;}
+.hero-h1 em{font-style:normal;background:linear-gradient(135deg,var(--accent) 0%,var(--cyan) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hero-sub{font-size:.93rem;color:var(--text2);line-height:1.78;margin-bottom:1.75rem;max-width:460px;}
+.hero-btns{display:flex;gap:10px;flex-wrap:wrap;}
+.hero-diagram{background:var(--glass2);border:1px solid var(--border);border-radius:var(--r16);padding:1.25rem;backdrop-filter:blur(20px);}
+.stats-strip{display:grid;grid-template-columns:repeat(4,1fr);background:var(--border);gap:1px;border-radius:var(--r12);overflow:hidden;border:1px solid var(--border);margin-top:3rem;}
+.stat-cell{background:var(--bg2);padding:1.6rem;text-align:center;}
+.stat-n{font-family:var(--fd);font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.stat-l{font-size:11.5px;color:var(--text2);margin-top:2px;}
+
+/* Featured section */
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.15rem;margin-top:1.75rem;}
+.feat-big{grid-row:span 2;background:var(--glass2);border:1px solid var(--border);border-radius:var(--r16);padding:1.75rem;cursor:pointer;transition:all .25s;}
+.feat-big:hover{border-color:rgba(59,130,246,.32);transform:translateY(-3px);box-shadow:0 20px 60px rgba(0,0,0,.45);}
+.feat-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:21px;margin-bottom:1rem;}
+/* Testimonials */
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.15rem;margin-top:1.75rem;}
+.testi{background:var(--glass2);border:1px solid var(--border);border-radius:var(--r12);padding:1.35rem;}
+.testi-stars{color:var(--am);font-size:12.5px;margin-bottom:.65rem;}
+.testi-txt{font-size:13.5px;color:var(--text);line-height:1.72;font-style:italic;margin-bottom:.85rem;}
+.av{width:33px;height:33px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;font-family:var(--fd);}
+.av-name{font-size:12.5px;font-weight:600;color:#fff;}
+.av-role{font-size:11px;color:var(--text3);}
+
+/* ═══ LIBRARY PAGE ═══════════════════════════════════════════════════════════ */
+.filter-bar{display:flex;gap:.6rem;margin-bottom:1.6rem;flex-wrap:wrap;align-items:center;}
+.search-box{flex:1;min-width:200px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r8);padding:9px 14px;color:var(--text);font-size:13.5px;outline:none;transition:border .2s;}
+.search-box:focus{border-color:var(--accent2);}
+.search-box::placeholder{color:var(--text3);}
+.chip{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 13px;font-size:12.5px;color:var(--text2);cursor:pointer;transition:all .18s;user-select:none;}
+.chip:hover,.chip.on{background:rgba(59,130,246,.14);border-color:var(--accent2);color:var(--accent3);}
+.card-foot{display:flex;align-items:center;gap:.85rem;margin-top:1rem;padding-top:.9rem;border-top:1px solid var(--border);}
+.cm{font-size:11.5px;color:var(--text3);}
+.topic-chips{display:flex;gap:4px;flex-wrap:wrap;margin-top:.7rem;}
+.tc{font-size:11px;background:rgba(59,130,246,.09);color:var(--accent3);padding:2px 7px;border-radius:100px;}
+
+/* ═══ BUILDER PAGE ═══════════════════════════════════════════════════════════ */
+.builder-layout{display:grid;grid-template-columns:195px 1fr;gap:1.15rem;margin-top:1.6rem;}
+.palette{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:.9rem;}
+.pal-sec{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:.7rem;margin-top:.9rem;}
+.pal-sec:first-child{margin-top:0;}
+.comp-btn{display:flex;align-items:center;gap:7px;background:var(--bg4);border:1px solid var(--border);border-radius:7px;padding:8px 10px;margin-bottom:6px;font-size:12.5px;color:var(--text);cursor:grab;transition:all .18s;user-select:none;width:100%;text-align:left;}
+.comp-btn:hover{border-color:var(--accent2);color:var(--accent3);background:rgba(59,130,246,.06);}
+.comp-btn:active{cursor:grabbing;}
+.canvas-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);min-height:520px;position:relative;overflow:hidden;}
+.canvas-bar{display:flex;gap:.4rem;padding:.65rem .9rem;border-bottom:1px solid var(--border);background:rgba(0,0,0,.18);flex-wrap:wrap;align-items:center;}
+.canvas-grid-bg{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;opacity:.5;}
+.canvas-svg{position:absolute;inset:0;pointer-events:none;z-index:1;}
+.canvas-nodes{position:absolute;inset:0;z-index:2;}
+.canvas-hint{position:absolute;top:55%;left:50%;transform:translate(-50%,-50%);text-align:center;color:var(--text3);pointer-events:none;z-index:0;}
+.placed{position:absolute;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--text);cursor:move;user-select:none;display:flex;align-items:center;gap:5px;white-space:nowrap;z-index:3;transition:box-shadow .15s;}
+.placed:hover,.placed.sel{box-shadow:0 0 0 2px var(--accent2);border-color:var(--accent2);}
+.placed .del{color:var(--text3);font-size:10px;margin-left:4px;cursor:pointer;opacity:.6;}
+.placed .del:hover{color:var(--rose);opacity:1;}
+.saved-archs{margin-top:1.25rem;}
+.saved-item{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px 14px;margin-bottom:7px;display:flex;align-items:center;gap:10px;}
+/* connecting mode */
+.conn-mode .placed{cursor:crosshair;}
+.info-bar{font-size:12px;color:var(--text3);padding:5px 0;}
+
+/* ═══ CASE STUDIES ════════════════════════════════════════════════════════════ */
+.case-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1.75rem;}
+.case-card{background:var(--glass2);border:1px solid var(--border);border-radius:var(--r12);padding:1.35rem;cursor:pointer;transition:all .25s;text-align:center;}
+.case-card:hover{border-color:var(--accent2);transform:translateY(-4px);box-shadow:0 18px 55px rgba(0,0,0,.5);}
+.case-logo{width:52px;height:52px;border-radius:13px;margin:0 auto .85rem;display:flex;align-items:center;justify-content:center;font-size:21px;}
+.case-name{font-family:var(--fd);font-size:.92rem;font-weight:700;color:#fff;margin-bottom:.3rem;}
+.case-desc{font-size:11.5px;color:var(--text2);line-height:1.55;}
+.case-tag{display:inline-block;font-size:10.5px;color:var(--accent3);background:rgba(59,130,246,.1);border-radius:100px;padding:2px 9px;margin-top:.65rem;}
+.case-detail{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r16);padding:1.75rem;margin-top:1.75rem;display:none;animation:fadeUp .35s ease;}
+.case-detail.on{display:block;}
+.dtabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:1.35rem;overflow-x:auto;gap:0;}
+.dtab{padding:9px 17px;font-size:13px;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .18s;margin-bottom:-1px;white-space:nowrap;}
+.dtab.on,.dtab:hover{color:var(--accent3);border-bottom-color:var(--accent);}
+.dc{display:none;animation:fadeUp .25s ease;}.dc.on{display:block;}
+.arch-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:1.25rem;margin-top:.85rem;}
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem;margin-bottom:1.1rem;}
+.info-card{background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:1rem;text-align:center;}
+.info-n{font-family:var(--fd);font-size:1.25rem;font-weight:800;margin-bottom:2px;}
+.info-l{font-size:11px;color:var(--text3);}
+.to-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:.85rem;}
+.to-box{border-radius:9px;padding:1rem;}
+.to-y{background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.18);}
+.to-n{background:rgba(244,63,94,.07);border:1px solid rgba(244,63,94,.18);}
+.to-list{font-size:12.5px;color:var(--text2);line-height:1.75;padding-left:1.1rem;}
+.code-b{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:.9rem 1rem;font-family:var(--fm);font-size:12px;color:#93c5fd;line-height:1.72;overflow-x:auto;margin-top:.85rem;}
+.kw{color:#c084fc;}.str{color:#86efac;}.cmt{color:#4b6283;font-style:italic;}
+
+/* ═══ LEARNING HUB ════════════════════════════════════════════════════════════ */
+.topics-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(218px,1fr));gap:1rem;margin-top:1.75rem;}
+.topic-card{background:var(--glass2);border:1px solid var(--border);border-radius:var(--r12);padding:1.2rem;cursor:pointer;transition:all .25s;}
+.topic-card:hover{border-color:var(--accent2);transform:translateY(-3px);}
+.topic-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;margin-bottom:.85rem;}
+.topic-title{font-family:var(--fd);font-size:.88rem;font-weight:700;color:#fff;margin-bottom:.3rem;}
+.topic-desc{font-size:11.5px;color:var(--text2);line-height:1.55;}
+.topic-detail{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r16);padding:1.75rem;margin-top:1.5rem;display:none;animation:fadeUp .35s ease;}
+.topic-detail.on{display:block;}
+.art-item{background:var(--glass2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.35rem;margin-bottom:.6rem;display:flex;align-items:center;gap:1.25rem;cursor:pointer;transition:all .18s;}
+.art-item:hover{border-color:var(--border2);}
+.art-num{font-family:var(--fm);font-size:11px;color:var(--text3);min-width:26px;}
+.art-title{font-weight:600;color:var(--text);flex:1;font-size:13.5px;}
+.art-badge{font-size:11px;color:var(--accent3);background:rgba(59,130,246,.1);padding:2px 8px;border-radius:100px;white-space:nowrap;}
+/* Visual diagrams */
+.viz-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:1.25rem;margin-top:1rem;}
+.concept-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem;margin-top:.85rem;}
+.concept-card{background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:1rem;}
+.concept-title{font-size:13px;font-weight:700;margin-bottom:.35rem;}
+.concept-body{font-size:12px;color:var(--text2);line-height:1.65;}
+
+/* ═══ DASHBOARD ═══════════════════════════════════════════════════════════════ */
+.dash-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1.75rem;}
+.dstat{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:1.35rem;text-align:center;}
+.dstat-n{font-family:var(--fd);font-size:1.85rem;font-weight:800;}
+.dstat-l{font-size:12.5px;color:var(--text2);margin-top:3px;}
+.prog-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:1.35rem;}
+.prog-item{margin-bottom:.85rem;}
+.prog-label{display:flex;justify-content:space-between;font-size:12.5px;color:var(--text2);margin-bottom:5px;}
+.prog-bar{height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;transition:width 1s ease;}
+.badge-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem;margin-top:.85rem;}
+.badge-item{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.85rem;text-align:center;transition:all .2s;}
+.badge-item.earned{border-color:rgba(245,158,11,.38);background:rgba(245,158,11,.05);}
+.badge-item.earned .badge-n{color:var(--am);}
+.badge-ic{font-size:25px;margin-bottom:.4rem;}
+.badge-n{font-size:10.5px;font-weight:600;color:var(--text3);}
+.rec-item{display:flex;align-items:center;gap:.85rem;padding:.65rem 0;border-bottom:1px solid var(--border);}
+.rec-item:last-child{border-bottom:none;}
+.rec-ic{width:33px;height:33px;border-radius:8px;background:rgba(59,130,246,.14);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.rec-name{font-size:13.5px;font-weight:500;color:var(--text);}
+.rec-time{font-size:11px;color:var(--text3);}
+.rec-pts{font-size:11px;color:var(--em);background:rgba(16,185,129,.1);padding:2px 8px;border-radius:100px;white-space:nowrap;}
+
+/* ═══ COMMUNITY ══════════════════════════════════════════════════════════════ */
+.comm-grid{display:grid;grid-template-columns:2fr 1fr;gap:1.35rem;margin-top:1.75rem;}
+.post{background:var(--glass2);border:1px solid var(--border);border-radius:var(--r12);padding:1.2rem;margin-bottom:.9rem;transition:all .18s;}
+.post:hover{border-color:var(--border2);}
+.post-hdr{display:flex;align-items:center;gap:8px;margin-bottom:.65rem;}
+.post-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
+.post-author{font-size:12.5px;font-weight:600;color:var(--text);}
+.post-time{font-size:11px;color:var(--text3);}
+.post-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:.4rem;}
+.post-body{font-size:12.5px;color:var(--text2);line-height:1.58;}
+.post-foot{display:flex;gap:1rem;margin-top:.7rem;padding-top:.65rem;border-top:1px solid var(--border);}
+.pact{font-size:12px;color:var(--text3);cursor:pointer;transition:color .15s;display:flex;align-items:center;gap:3px;}
+.pact:hover{color:var(--accent2);}
+.sw{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:1.2rem;margin-bottom:.9rem;}
+.sw-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:.85rem;}
+.top-mem{display:flex;align-items:center;gap:8px;padding:.4rem 0;border-bottom:1px solid var(--border);}
+.top-mem:last-child{border-bottom:none;}
+.mem-name{font-size:13px;font-weight:500;color:var(--text);}
+.mem-pts{font-size:11px;color:var(--text3);}
+.htag{display:inline-block;font-size:11.5px;color:var(--accent3);background:rgba(59,130,246,.09);border:1px solid var(--border);border-radius:100px;padding:3px 10px;margin:3px;cursor:pointer;transition:all .18s;}
+.htag:hover{background:rgba(59,130,246,.18);}
+.ev-item{margin-bottom:.7rem;padding-bottom:.7rem;border-bottom:1px solid var(--border);}
+.ev-item:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none;}
+.ev-name{font-size:13px;color:var(--text);font-weight:500;}
+.ev-date{font-size:11px;color:var(--text3);}
+.np-form{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:1.2rem;margin-bottom:1rem;display:none;animation:fadeUp .25s ease;}
+.np-form.on{display:block;}
+.np-in{width:100%;background:var(--bg4);border:1px solid var(--border);border-radius:7px;padding:8px 12px;color:var(--text);font-size:13.5px;outline:none;margin-bottom:.55rem;transition:border .18s;}
+.np-in:focus{border-color:var(--accent2);}
+.np-ta{width:100%;background:var(--bg4);border:1px solid var(--border);border-radius:7px;padding:8px 12px;color:var(--text);font-size:13px;outline:none;resize:vertical;min-height:80px;margin-bottom:.65rem;transition:border .18s;}
+.np-ta:focus{border-color:var(--accent2);}
+.pill-tabs{display:flex;gap:.35rem;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:3px;}
+.ptab{padding:5px 12px;border-radius:5px;font-size:12.5px;color:var(--text2);cursor:pointer;transition:all .18s;}
+.ptab.on{background:var(--accent);color:#fff;}
+
+/* ═══ ADMIN ══════════════════════════════════════════════════════════════════ */
+.admin-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.75rem;}
+.astat{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:1.2rem;}
+.astat-n{font-family:var(--fd);font-size:1.65rem;font-weight:800;color:#fff;}
+.astat-l{font-size:12px;color:var(--text2);}
+.astat-d{font-size:12px;color:var(--em);margin-top:3px;}
+.atable{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);overflow:hidden;margin-bottom:1.25rem;}
+.atable-hdr{padding:.85rem 1.25rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.atable-ttl{font-size:13.5px;font-weight:700;color:#fff;}
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;padding:.6rem 1.25rem;font-size:11px;color:var(--text3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;border-bottom:1px solid var(--border);}
+td{padding:.62rem 1.25rem;font-size:12.5px;color:var(--text);border-bottom:1px solid rgba(99,180,255,.04);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(99,180,255,.02);}
+.pill{display:inline-flex;align-items:center;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:100px;}
+.pill-a{background:rgba(16,185,129,.14);color:var(--em);}
+.pill-p{background:rgba(245,158,11,.14);color:var(--am);}
+.pill-i{background:rgba(100,116,139,.14);color:#64748b;}
+.bars-chart{display:flex;align-items:flex-end;gap:3px;height:72px;}
+.bar{flex:1;border-radius:3px 3px 0 0;transition:height .6s ease;}
+.bar-lbl{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);font-family:var(--fm);margin-top:4px;}
+
+/* ═══ ANIMATIONS ══════════════════════════════════════════════════════════════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes flow{0%{stroke-dashoffset:20;}100%{stroke-dashoffset:0;}}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.flow-line{stroke-dasharray:5 3;animation:flow 2s linear infinite;}
+.pulse-dot{animation:pulse 2s ease-in-out infinite;}
+.fade-up{animation:fadeUp .5s ease both;}
+
+/* ═══ TOASTS ══════════════════════════════════════════════════════════════════ */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r8);padding:.9rem 1.25rem;font-size:13px;color:var(--text);z-index:999;animation:slideIn .25s ease;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.5);}
+
+/* ═══ RESPONSIVE ══════════════════════════════════════════════════════════════ */
+@media(max-width:860px){
+  .hero-grid,.feat-grid,.builder-layout,.comm-grid{grid-template-columns:1fr;}
+  .stats-strip,.case-grid,.testi-grid,.admin-stats{grid-template-columns:repeat(2,1fr);}
+  .dash-stats,.badge-grid{grid-template-columns:1fr 1fr;}
+  .hero-h1{font-size:2.2rem;}
+  .nav-link:not(.nav-cta){display:none;}
+  .nav-mobile{display:block;}
+  .info-grid{grid-template-columns:repeat(3,1fr);}
+}
+@media(max-width:520px){
+  .stats-strip,.admin-stats{grid-template-columns:1fr 1fr;}
+  .case-grid{grid-template-columns:repeat(2,1fr);}
+  .info-grid,.to-grid{grid-template-columns:1fr;}
+}
+/* Mobile nav overlay */
+.mobile-nav{display:none;position:fixed;top:58px;left:0;right:0;background:var(--bg2);border-bottom:1px solid var(--border);z-index:199;padding:1rem;flex-direction:column;gap:.35rem;}
+.mobile-nav.on{display:flex;}
+.mobile-nav .nav-link{text-align:left;padding:8px 12px;}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══════════════════════════════════════════════════════════════════ -->
+<nav id="nav">
+  <div class="nav-brand" onclick="go('home')"><b>Arch</b>itectIQ</div>
+  <button class="nav-link on" id="n-home" onclick="go('home')">Home</button>
+  <button class="nav-link" id="n-library" onclick="go('library')">Library</button>
+  <button class="nav-link" id="n-builder" onclick="go('builder')">Builder</button>
+  <button class="nav-link" id="n-cases" onclick="go('cases')">Case Studies</button>
+  <button class="nav-link" id="n-learning" onclick="go('learning')">Learning Hub</button>
+  <button class="nav-link" id="n-community" onclick="go('community')">Community</button>
+  <button class="nav-link" id="n-dashboard" onclick="go('dashboard')">Dashboard</button>
+  <button class="nav-link" id="n-admin" onclick="go('admin')">Admin</button>
+  <div class="nav-spacer"></div>
+  <span id="auth-status" style="font-size:12px;color:var(--text2);margin-right:.4rem;"></span>
+  <button class="nav-link" id="n-signin" onclick="openAuthModal('login')">Sign In</button>
+  <button class="nav-cta" onclick="go('library')">Get Started →</button>
+  <button class="nav-mobile" onclick="toggleMobileNav()" id="mb-btn">☰</button>
+</nav>
+
+<!-- ═══ AUTH MODAL ════════════════════════════════════════════════════════════ -->
+<div id="auth-overlay" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(6,10,18,0.7);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
+  <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r16);padding:1.75rem;width:340px;max-width:90vw;position:relative;">
+    <button onclick="closeAuthModal()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer;">✕</button>
+    <div class="sect-title" id="auth-modal-title">Sign In</div>
+    <div id="auth-name-field" style="display:none;margin-bottom:.6rem;">
+      <input class="np-in" id="auth-name" placeholder="Full name" style="width:100%;">
+    </div>
+    <div style="margin-bottom:.6rem;"><input class="np-in" id="auth-email" type="email" placeholder="Email" style="width:100%;"></div>
+    <div style="margin-bottom:.9rem;"><input class="np-in" id="auth-password" type="password" placeholder="Password" style="width:100%;"></div>
+    <button class="btn btn-p" style="width:100%;justify-content:center;" id="auth-submit-btn" onclick="submitAuth()">Sign In</button>
+    <div style="text-align:center;font-size:12px;color:var(--text2);margin-top:.9rem;">
+      <span id="auth-switch-text">Don't have an account?</span>
+      <a href="#" id="auth-switch-link" onclick="toggleAuthMode();return false;" style="color:var(--accent2);">Sign up</a>
+    </div>
+    <div id="auth-error" style="color:var(--rose);font-size:12px;margin-top:.6rem;display:none;"></div>
+  </div>
+</div>
+<div class="mobile-nav" id="mobile-nav">
+  <button class="nav-link" onclick="go('home');toggleMobileNav()">Home</button>
+  <button class="nav-link" onclick="go('library');toggleMobileNav()">Library</button>
+  <button class="nav-link" onclick="go('builder');toggleMobileNav()">Builder</button>
+  <button class="nav-link" onclick="go('cases');toggleMobileNav()">Case Studies</button>
+  <button class="nav-link" onclick="go('learning');toggleMobileNav()">Learning Hub</button>
+  <button class="nav-link" onclick="go('community');toggleMobileNav()">Community</button>
+  <button class="nav-link" onclick="go('dashboard');toggleMobileNav()">Dashboard</button>
+  <button class="nav-link" onclick="go('admin');toggleMobileNav()">Admin</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     HOME PAGE
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="pg on" id="home">
+  <div class="hero-outer">
+    <div class="hero-radial"></div>
+    <div class="grid-lines"></div>
+    <div class="wrap">
+      <div class="hero-grid">
+        <div class="fade-up">
+          <div class="hero-badge"><span>NEW</span> Enterprise Scale Projects Added</div>
+          <h1 class="hero-h1">Master<br><em>System Design</em><br>at Scale</h1>
+          <p class="hero-sub">Learn, visualize, and practice large-scale system design through interactive diagrams, real-world case studies, and portfolio-ready projects trusted by 42,000+ engineers.</p>
+          <div class="hero-btns">
+            <button class="btn btn-p" onclick="go('library')">Explore Projects →</button>
+            <button class="btn btn-s" onclick="go('learning')">Start Learning</button>
+          </div>
+        </div>
+        <div class="hero-diagram fade-up" style="animation-delay:.15s;">
+          <svg viewBox="0 0 340 248" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+            <rect x="128" y="8" width="84" height="26" rx="6" fill="rgba(6,182,212,.14)" stroke="rgba(6,182,212,.4)" stroke-width="1"/>
+            <text x="170" y="25" fill="#67e8f9" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">CDN</text>
+            <rect x="128" y="58" width="84" height="26" rx="6" fill="rgba(59,130,246,.14)" stroke="rgba(59,130,246,.4)" stroke-width="1"/>
+            <text x="170" y="75" fill="#93c5fd" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">Load Balancer</text>
+            <rect x="128" y="108" width="84" height="26" rx="6" fill="rgba(139,92,246,.14)" stroke="rgba(139,92,246,.4)" stroke-width="1"/>
+            <text x="170" y="125" fill="#c4b5fd" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">API Gateway</text>
+            <rect x="16" y="162" width="74" height="24" rx="5" fill="rgba(16,185,129,.11)" stroke="rgba(16,185,129,.32)" stroke-width="1"/>
+            <text x="53" y="178" fill="#6ee7b7" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Auth Service</text>
+            <rect x="133" y="162" width="74" height="24" rx="5" fill="rgba(16,185,129,.11)" stroke="rgba(16,185,129,.32)" stroke-width="1"/>
+            <text x="170" y="178" fill="#6ee7b7" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">User Service</text>
+            <rect x="250" y="162" width="74" height="24" rx="5" fill="rgba(16,185,129,.11)" stroke="rgba(16,185,129,.32)" stroke-width="1"/>
+            <text x="287" y="178" fill="#6ee7b7" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Feed Service</text>
+            <rect x="16" y="212" width="64" height="22" rx="5" fill="rgba(245,158,11,.11)" stroke="rgba(245,158,11,.28)" stroke-width="1"/>
+            <text x="48" y="227" fill="#fcd34d" font-size="8.5" text-anchor="middle" font-family="DM Sans" font-weight="600">PostgreSQL</text>
+            <rect x="138" y="212" width="64" height="22" rx="5" fill="rgba(244,63,94,.11)" stroke="rgba(244,63,94,.28)" stroke-width="1"/>
+            <text x="170" y="227" fill="#fda4af" font-size="8.5" text-anchor="middle" font-family="DM Sans" font-weight="600">Redis Cache</text>
+            <rect x="260" y="212" width="64" height="22" rx="5" fill="rgba(245,158,11,.11)" stroke="rgba(245,158,11,.28)" stroke-width="1"/>
+            <text x="292" y="227" fill="#fcd34d" font-size="8.5" text-anchor="middle" font-family="DM Sans" font-weight="600">Kafka</text>
+            <line x1="170" y1="34" x2="170" y2="58" stroke="rgba(99,180,255,.45)" stroke-width="1" class="flow-line"/>
+            <line x1="170" y1="84" x2="170" y2="108" stroke="rgba(99,180,255,.45)" stroke-width="1" class="flow-line" style="animation-delay:.3s"/>
+            <line x1="147" y1="134" x2="53" y2="162" stroke="rgba(99,180,255,.32)" stroke-width="1" class="flow-line" style="animation-delay:.5s"/>
+            <line x1="170" y1="134" x2="170" y2="162" stroke="rgba(99,180,255,.32)" stroke-width="1" class="flow-line" style="animation-delay:.7s"/>
+            <line x1="193" y1="134" x2="287" y2="162" stroke="rgba(99,180,255,.32)" stroke-width="1" class="flow-line" style="animation-delay:.9s"/>
+            <line x1="53" y1="186" x2="48" y2="212" stroke="rgba(99,180,255,.18)" stroke-width="1"/>
+            <line x1="170" y1="186" x2="170" y2="212" stroke="rgba(99,180,255,.18)" stroke-width="1"/>
+            <line x1="287" y1="186" x2="292" y2="212" stroke="rgba(99,180,255,.18)" stroke-width="1"/>
+            <circle cx="170" cy="46" r="2.5" fill="#3b82f6" class="pulse-dot"/>
+            <circle cx="170" cy="96" r="2.5" fill="#8b5cf6" class="pulse-dot" style="animation-delay:.6s"/>
+            <circle cx="170" cy="148" r="2.5" fill="#06b6d4" class="pulse-dot" style="animation-delay:1.2s"/>
+          </svg>
+          <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:.45rem;font-family:var(--fm);">// live architecture preview</div>
+        </div>
+      </div>
+      <div class="stats-strip fade-up" style="animation-delay:.25s;">
+        <div class="stat-cell"><div class="stat-n">247</div><div class="stat-l">Design Projects</div></div>
+        <div class="stat-cell"><div class="stat-n">42K+</div><div class="stat-l">Active Engineers</div></div>
+        <div class="stat-cell"><div class="stat-n">89</div><div class="stat-l">Topics Covered</div></div>
+        <div class="stat-cell"><div class="stat-n">4.9★</div><div class="stat-l">Average Rating</div></div>
+      </div>
+
+      <!-- Featured -->
+      <div style="margin-top:3.5rem;">
+        <div class="pg-label">Featured</div>
+        <div class="pg-title" style="font-size:1.6rem;">Explore Real-World Architectures</div>
+        <div class="feat-grid">
+          <div class="feat-big card" onclick="go('cases')">
+            <div class="feat-icon" style="background:linear-gradient(135deg,#e50914,#ff6835);">🎬</div>
+            <span class="tag t-e">Enterprise Scale</span>
+            <div style="font-family:var(--fd);font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:.45rem;">Design Netflix at Scale</div>
+            <p style="font-size:13px;color:var(--text2);line-height:1.68;margin-bottom:.9rem;">200M+ users, global CDN, adaptive bitrate streaming, chaos engineering & petabyte Cassandra clusters.</p>
+            <ul style="font-size:12.5px;color:var(--text2);padding-left:1.1rem;line-height:1.85;margin-bottom:1rem;">
+              <li>Open Connect CDN with 1000+ PoPs</li><li>Chaos Monkey resilience testing</li><li>EVCache + Cassandra data layer</li><li>Zuul API gateway microservices mesh</li>
+            </ul>
+            <div class="card-foot"><span class="cm">⏱ 8 hrs</span><span class="cm">★ 4.9 (2.4k)</span><span style="margin-left:auto;color:var(--accent2);">→</span></div>
+          </div>
+          <div class="card" onclick="go('library')">
+            <span class="tag t-a">Advanced</span>
+            <div style="font-family:var(--fd);font-size:1rem;font-weight:700;color:#fff;margin-bottom:.4rem;">URL Shortener at Scale</div>
+            <p style="font-size:12.5px;color:var(--text2);">100M+ redirects/day with consistent hashing and distributed caching.</p>
+            <div class="card-foot"><span class="cm">⏱ 3 hrs</span><span class="cm">★ 4.8</span><span style="margin-left:auto;color:var(--accent2);">→</span></div>
+          </div>
+          <div class="card" onclick="go('library')">
+            <span class="tag t-i">Intermediate</span>
+            <div style="font-family:var(--fd);font-size:1rem;font-weight:700;color:#fff;margin-bottom:.4rem;">Real-Time Chat System</div>
+            <p style="font-size:12.5px;color:var(--text2);">WhatsApp-style WebSocket messaging with E2E encryption for 50M concurrent users.</p>
+            <div class="card-foot"><span class="cm">⏱ 4 hrs</span><span class="cm">★ 4.7</span><span style="margin-left:auto;color:var(--accent2);">→</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Testimonials -->
+      <div style="margin-top:3.5rem;padding-bottom:3rem;">
+        <div class="pg-label">Testimonials</div>
+        <div class="pg-title" style="font-size:1.6rem;">Trusted by Engineers Worldwide</div>
+        <div class="testi-grid">
+          <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-txt">"The interactive architecture builder changed how I prepare for interviews. Got offers from Google and Meta after 3 weeks on this platform."</p><div style="display:flex;align-items:center;gap:9px;"><div class="av" style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);">AK</div><div><div class="av-name">Arjun Kumar</div><div class="av-role">SWE @ Google</div></div></div></div>
+          <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-txt">"Best distributed systems learning resource I've found. The Netflix case study alone is worth more than any textbook on the subject."</p><div style="display:flex;align-items:center;gap:9px;"><div class="av" style="background:linear-gradient(135deg,#06b6d4,#10b981);">SL</div><div><div class="av-name">Sarah Lin</div><div class="av-role">Staff Engineer @ Stripe</div></div></div></div>
+          <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-txt">"I finally understood CAP theorem and distributed consensus after years of struggle. The visual explainers are genuinely unmatched."</p><div style="display:flex;align-items:center;gap:9px;"><div class="av" style="background:linear-gradient(135deg,#f59e0b,#ef4444);">MO</div><div><div class="av-name">Marcus Okafor</div><div class="av-role">Principal Architect @ Amazon</div></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     LIBRARY
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="pg" id="library">
+  <div class="wrap">
+    <div class="pg-label">Project Library</div>
+    <div class="pg-title">247 System Design Projects</div>
+    <p class="pg-sub">Beginner fundamentals to enterprise architectures. Filter by difficulty.</p>
+    <div class="filter-bar" style="margin-top:1.75rem;">
+      <input type="text" class="search-box" id="lib-q" placeholder="Search projects…" oninput="renderLib()">
+      <div class="chip on" onclick="setLibF('all',this)">All</div>
+      <div class="chip" onclick="setLibF('beginner',this)">Beginner</div>
+      <div class="chip" onclick="setLibF('intermediate',this)">Intermediate</div>
+      <div class="chip" onclick="setLibF('advanced',this)">Advanced</div>
+      <div class="chip" onclick="setLibF('enterprise',this)">Enterprise</div>
+    </div>
+    <div class="card-grid" id="lib-grid"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     BUILDER
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="pg" id="builder">
+  <div class="wrap">
+    <div class="pg-label">Interactive Builder</div>
+    <div class="pg-title">Architecture Canvas</div>
+    <p class="pg-sub">Drag components onto the canvas. Click two nodes to draw connections. Use templates to start fast.</p>
+    <div class="builder-layout">
+      <!-- Palette -->
+      <div class="palette">
+        <div class="pal-sec">Network</div>
+        <button class="comp-btn" draggable="true" data-c="CDN" data-e="🌐">🌐 CDN</button>
+        <button class="comp-btn" draggable="true" data-c="DNS" data-e="🛜">🛜 DNS</button>
+        <button class="comp-btn" draggable="true" data-c="Load Balancer" data-e="⚖️">⚖️ Load Balancer</button>
+        <button class="comp-btn" draggable="true" data-c="API Gateway" data-e="🔀">🔀 API Gateway</button>
+        <div class="pal-sec">Services</div>
+        <button class="comp-btn" draggable="true" data-c="Microservice" data-e="⚙️">⚙️ Microservice</button>
+        <button class="comp-btn" draggable="true" data-c="Auth Service" data-e="🔐">🔐 Auth Service</button>
+        <button class="comp-btn" draggable="true" data-c="Search Engine" data-e="🔍">🔍 Search Engine</button>
+        <div class="pal-sec">Data</div>
+        <button class="comp-btn" draggable="true" data-c="Database" data-e="🗄️">🗄️ Database</button>
+        <button class="comp-btn" draggable="true" data-c="Cache" data-e="⚡">⚡ Cache (Redis)</button>
+        <button class="comp-btn" draggable="true" data-c="Storage" data-e="💾">💾 Object Storage</button>
+        <button class="comp-btn" draggable="true" data-c="Message Queue" data-e="📨">📨 Message Queue</button>
+        <div class="pal-sec">Ops</div>
+        <button class="comp-btn" draggable="true" data-c="Monitoring" data-e="📊">📊 Monitoring</button>
+        <button class="comp-btn" draggable="true" data-c="Rate Limiter" data-e="🚦">🚦 Rate Limiter</button>
+        <div class="pal-sec">Templates</div>
+        <button class="btn-sm" style="width:100%;margin-bottom:5px;text-align:left;" onclick="loadTpl('micro')">⚙️ Microservices App</button>
+        <button class="btn-sm" style="width:100%;margin-bottom:5px;text-align:left;" onclick="loadTpl('event')">📨 Event-Driven</button>
+        <button class="btn-sm" style="width:100%;margin-bottom:5px;text-align:left;" onclick="loadTpl('chat')">💬 Real-Time Chat</button>
+        <button class="btn-sm" style="width:100%;text-align:left;" onclick="loadTpl('cdn')">🌐 CDN + API Layer</button>
+      </div>
+      <!-- Canvas -->
+      <div>
+        <div class="canvas-wrap" id="bcanvas">
+          <div class="canvas-bar">
+            <button class="btn-sm" onclick="clearCanvas()">🗑 Clear</button>
+            <button class="btn-sm" id="conn-btn" onclick="toggleConnMode()">🔗 Connect</button>
+            <button class="btn-sm" onclick="clearConnections()">✂️ Wires</button>
+            <button class="btn-sm" onclick="saveArch()">💾 Save</button>
+            <button class="btn-sm" onclick="exportArch()">📤 Export</button>
+            <button class="btn-sm" onclick="undoNode()">↩ Undo</button>
+            <span class="info-bar" id="canvas-info" style="margin-left:auto;">0 nodes</span>
+          </div>
+          <div class="canvas-grid-bg"></div>
+          <div class="canvas-hint" id="canvas-hint">
+            <div style="font-size:38px;opacity:.2;margin-bottom:.75rem;">🏗️</div>
+            <div style="font-size:13.5px;">Drop components or pick a template</div>
+            <div style="font-size:12px;margin-top:.35rem;color:var(--text3);">Then use <strong style="color:var(--accent3);">Connect</strong> to draw arrows</div>
+          </div>
+          <svg class="canvas-svg" id="canvas-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div class="canvas-nodes" id="canvas-nodes"></div>
+        </div>
+        <div id="conn-status" style="font-size:12px;color:var(--accent3);margin-top:.5rem;min-height:1.2rem;display:none;"></div>
+        <div class="saved-archs" id="saved-archs"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     CASE STUDIES
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="pg" id="cases">
+  <div class="wrap">
+    <div class="pg-label">Case Studies</div>
+    <div class="pg-title">How Tech Giants Scale</div>
+    <p class="pg-sub">Deep-dive architectures powering billions of users worldwide.</p>
+    <div id="case-overview">
+      <div class="case-grid">
+        <div class="case-card" onclick="openCase('netflix')"><div class="case-logo" style="background:rgba(229,9,20,.18);">🎬</div><div class="case-name">Netflix</div><div class="case-desc">Global video streaming at 200M+ users</div><span class="case-tag">Video Streaming</span></div>
+        <div class="case-card" onclick="openCase('youtube')"><div class="case-logo" style="background:rgba(255,0,0,.13);">▶️</div><div class="case-name">YouTube</div><div class="case-desc">500 hours of video uploaded every minute</div><span class="case-tag">Media Platform</span></div>
+        <div class="case-card" onclick="openCase('uber')"><div class="case-logo" style="background:rgba(20,20,20,.7);">🚗</div><div class="case-name">Uber</div><div class="case-desc">Real-time geo-distributed ride matching</div><span class="case-tag">Geo-Distributed</span></div>
+        <div class="case-card" onclick="openCase('whatsapp')"><div class="case-logo" style="background:rgba(37,211,102,.13);">💬</div><div class="case-name">WhatsApp</div><div class="case-desc">2B+ users, 100B messages daily</div><span class="case-tag">Messaging</span></div>
+        <div class="case-card" onclick="openCase('instagram')"><div class="case-logo" style="background:rgba(194,48,100,.18);">📸</div><div class="case-name">Instagram</div><div class="case-desc">Photo/video social feed at massive scale</div><span class="case-tag">Social Media</span></div>
+        <div class="case-card" onclick="openCase('amazon')"><div class="case-logo" style="background:rgba(255,153,0,.18);">📦</div><div class="case-name">Amazon</div><div class="case-desc">E-commerce + AWS cloud at planet scale</div><span class="case-tag">E-Commerce</span></div>
+      </div>
+    </div>
+    <div class="case-detail" id="case-detail">
+      <button class="btn-sm" onclick="closeCase()" style="margin-bottom:1.1rem;">← Back</button>
+      <div id="case-title" style="font-family:var(--fd);font-size:1.45rem;font-weight:800;color:#fff;margin-bottom:1.1rem;"></div>
+      <div class="dtabs" id="case-tabs"></div>
+      <div id="case-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     LEARNING HUB
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="pg" id="learning">
+  <div class="wrap">
+    <div class="pg-label">Learning Hub</div>
+    <div class="pg-title">Master the Fundamentals</div>
+    <p class="pg-sub">Visualize every concept with interactive explainers and deep-dive articles.</p>
+    <div id="learn-main">
+      <div class="topics-grid">
+        <div class="topic-card" onclick="openTopic('lb')"><div class="topic-icon" style="background:rgba(59,130,246,.14);">⚖️</div><div class="topic-title">Load Balancing</div><div class="topic-desc">Round-robin, least-connections, consistent hashing</div></div>
+        <div class="topic-card" onclick="openTopic('cache')"><div class="topic-icon" style="background:rgba(6,182,212,.14);">⚡</div><div class="topic-title">Caching Strategies</div><div class="topic-desc">Write-through, write-behind, cache-aside, eviction</div></div>
+        <div class="topic-card" onclick="openTopic('shard')"><div class="topic-icon" style="background:rgba(245,158,11,.14);">🗃️</div><div class="topic-title">Database Sharding</div><div class="topic-desc">Horizontal scaling, shard keys, rebalancing</div></div>
+        <div class="topic-card" onclick="openTopic('repl')"><div class="topic-icon" style="background:rgba(16,185,129,.14);">🔄</div><div class="topic-title">Replication</div><div class="topic-desc">Leader-follower, multi-leader, leaderless, quorum</div></div>
+        <div class="topic-card" onclick="openTopic('event')"><div class="topic-icon" style="background:rgba(139,92,246,.14);">📨</div><div class="topic-title">Event-Driven Arch</div><div class="topic-desc">Kafka, event sourcing, CQRS patterns</div></div>
+        <div class="topic-card" onclick="openTopic('micro')"><div class="topic-icon" style="background:rgba(244,63,94,.14);">⚙️</div><div class="topic-title">Microservices</div><div class="topic-desc">Circuit breakers, service mesh, saga pattern</div></div>
+        <div class="topic-card" onclick="openTopic('dist')"><div class="topic-icon" style="background:rgba(59,130,246,.14);">🌐</div><div class="topic-title">Distributed Systems</div><div class="topic-desc">CAP theorem, Raft consensus, vector clocks</div></div>
+        <div class="topic-card" onclick="openTopic('auth')"><div class="topic-icon" style="background:rgba(6,182,212,.14);">🔐</div><div class="topic-title">Auth & Security</div><div class="topic-desc">OAuth 2.0, JWT, zero-trust, rate limiting</div></div>
+      </div>
+      <div style="margin-top:2.5rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+          <div class="sect-title" style="margin-bottom:0;">Latest Articles</div>
+          <div class="pill-tabs" id="art-filter">
+            <div class="ptab on" onclick="artFilter('all',this)">All</div>
+            <div class="ptab" onclick="artFilter('beginner',this)">Beginner</div>
+            <div class="ptab" onclick="artFilter('deep',this)">Deep Dive</div>
+          </div>
+        </div>
+        <div id="art-list"></div>
+      </div>
+    </div>
+    <div class="topic-detail" id="topic-detail">
+      <button class="btn-sm" onclick="closeTopic()" style="margin-bottom:1rem;">← Back to Topics</button>
+      <div id="topic-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     DASHBOARD
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="pg" id="dashboard">
+  <div class="wrap">
+    <div class="pg-label">My Dashboard</div>
+    <div class="pg-title">Welcome back, Engineer 👋</div>
+    <div class="dash-stats">
+      <div class="dstat"><div class="dstat-n" style="color:var(--accent2);">23</div><div class="dstat-l">Projects Completed</div></div>
+      <div class="dstat"><div class="dstat-n" style="color:var(--em);">67%</div><div class="dstat-l">Learning Progress</div></div>
+      <div class="dstat"><div class="dstat-n" style="color:var(--am);">8</div><div class="dstat-l">Badges Earned</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.15rem;margin-top:1.15rem;">
+      <div class="prog-box">
+        <div class="sect-title">Learning Progress</div>
+        <div id="prog-bars"></div>
+      </div>
+      <div class="prog-box">
+        <div class="sect-title">Recent Activity</div>
+        <div id="activity-list"></div>
+      </div>
+    </div>
+    <div class="prog-box" style="margin-top:1.15rem;">
+      <div class="sect-title">Achievement Badges</div>
+      <div class="badge-grid" id="badge-grid"></div>
+    </div>
+    <div class="prog-box" style="margin-top:1.15rem;">
+      <div class="sect-title">Saved Projects</div>
+      <div id="saved-projs"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     COMMUNITY
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="pg" id="community">
+  <div class="wrap">
+    <div class="pg-label">Community</div>
+    <div class="pg-title">42,000+ Engineers Building Together</div>
+    <div class="comm-grid">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem;">
+          <div class="pill-tabs" id="post-filter">
+            <div class="ptab on" onclick="setPostF('all',this)">All</div>
+            <div class="ptab" onclick="setPostF('trending',this)">Trending</div>
+            <div class="ptab" onclick="setPostF('latest',this)">Latest</div>
+          </div>
+          <button class="btn btn-p" style="padding:7px 15px;font-size:12.5px;" onclick="toggleNewPost()">+ New Post</button>
+        </div>
+        <div class="np-form" id="np-form">
+          <input class="np-in" id="np-title" placeholder="Post title…">
+          <textarea class="np-ta" id="np-body" placeholder="Share knowledge, ask a question, or start a discussion…"></textarea>
+          <div style="display:flex;gap:.5rem;">
+            <button class="btn btn-p" style="padding:7px 15px;font-size:12.5px;" onclick="submitPost()">Publish</button>
+            <button class="btn btn-s" style="padding:7px 15px;font-size:12.5px;" onclick="toggleNewPost()">Cancel</button>
+          </div>
+        </div>
+        <div id="post-list"></div>
+      </div>
+      <div>
+        <div class="sw">
+          <div class="sw-title">🏆 Top Contributors</div>
+          <div class="top-mem"><div class="av" style="background:linear-gradient(135deg,#f59e0b,#ef4444);font-size:10px;">1</div><div style="flex:1;"><div class="mem-name">priya_sys</div><div class="mem-pts">12,340 pts</div></div><span style="font-size:11px;color:var(--am);">★ Expert</span></div>
+          <div class="top-mem"><div class="av" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);font-size:10px;">2</div><div style="flex:1;"><div class="mem-name">arch_master</div><div class="mem-pts">11,820 pts</div></div><span style="font-size:11px;color:var(--am);">★ Expert</span></div>
+          <div class="top-mem"><div class="av" style="background:linear-gradient(135deg,#06b6d4,#10b981);font-size:10px;">3</div><div style="flex:1;"><div class="mem-name">distributed_dev</div><div class="mem-pts">9,770 pts</div></div><span style="font-size:11px;color:var(--am);">★ Pro</span></div>
+          <div class="top-mem"><div class="av" style="background:linear-gradient(135deg,#10b981,#06b6d4);font-size:10px;">4</div><div style="flex:1;"><div class="mem-name">kafka_queen</div><div class="mem-pts">8,450 pts</div></div><span style="font-size:11px;color:var(--am);">★ Pro</span></div>
+        </div>
+        <div class="sw">
+          <div class="sw-title">🔥 Hot Topics</div>
+          <div id="hot-tags"></div>
+        </div>
+        <div class="sw">
+          <div class="sw-title">📅 Upcoming Events</div>
+          <div class="ev-item"><div class="ev-name">System Design Interview Prep</div><div class="ev-date">Live Workshop · Jun 15</div></div>
+          <div class="ev-item"><div class="ev-name">Distributed Systems AMA</div><div class="ev-date">Community Call · Jun 22</div></div>
+          <div class="ev-item"><div class="ev-name">Architecture Review Challenge</div><div class="ev-date">Competition · Jul 1</div></div>
+          <div class="ev-item"><div class="ev-name">Kafka Deep Dive Webinar</div><div class="ev-date">Webinar · Jul 8</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     ADMIN
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="pg" id="admin">
+  <div class="wrap">
+    <div class="pg-label">Admin Dashboard</div>
+    <div class="pg-title">Platform Analytics</div>
+    <div class="admin-stats">
+      <div class="astat"><div class="astat-n" style="color:var(--accent2);">42,138</div><div class="astat-l">Total Users</div><div class="astat-d">↑ 12.4% this month</div></div>
+      <div class="astat"><div class="astat-n" style="color:var(--em);">247</div><div class="astat-l">Active Projects</div><div class="astat-d">↑ 8 new this week</div></div>
+      <div class="astat"><div class="astat-n" style="color:var(--am);">1.2M</div><div class="astat-l">Page Views / Mo</div><div class="astat-d">↑ 34.2% YoY</div></div>
+      <div class="astat"><div class="astat-n" style="color:var(--violet);">4.9★</div><div class="astat-l">Platform Rating</div><div class="astat-d" style="color:var(--text3);">8.4k reviews</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.15rem;margin-bottom:1.25rem;">
+      <div class="atable">
+        <div class="atable-hdr"><span class="atable-ttl">Monthly Active Users (K)</span></div>
+        <div style="padding:.85rem 1.25rem;">
+          <div class="bars-chart" id="mau-chart"></div>
+          <div class="bar-lbl" id="mau-lbl"></div>
+        </div>
+      </div>
+      <div class="atable">
+        <div class="atable-hdr"><span class="atable-ttl">Projects by Difficulty</span></div>
+        <div style="padding:.85rem 1.25rem;" id="cat-bars"></div>
+      </div>
+    </div>
+    <div class="atable">
+      <div class="atable-hdr"><span class="atable-ttl">Recent Users</span><button class="btn-sm" onclick="toast('CSV export started…')">Export CSV</button></div>
+      <table><thead><tr><th>Name</th><th>Email</th><th>Joined</th><th>Projects</th><th>Status</th><th>Action</th></tr></thead><tbody id="users-tb"></tbody></table>
+    </div>
+    <div class="atable">
+      <div class="atable-hdr"><span class="atable-ttl">Projects</span><button class="btn-sm" onclick="toast('Add project form coming soon')">+ Add Project</button></div>
+      <table><thead><tr><th>Title</th><th>Level</th><th>Author</th><th>Views</th><th>Rating</th><th>Status</th><th>Action</th></tr></thead><tbody id="proj-tb"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════════════════════════════════════
+   API / AUTH
+══════════════════════════════════════════════════════════════════════════*/
+const API_BASE = (window.ARCHITECTIQ_API_BASE) || 'http://localhost:8000/api';
+let authToken = localStorage.getItem('aiq_token') || null;
+let currentUser = JSON.parse(localStorage.getItem('aiq_user') || 'null');
+
+async function apiFetch(path, opts={}){
+  const headers = Object.assign({'Content-Type':'application/json'}, opts.headers||{});
+  if(authToken) headers['Authorization'] = 'Bearer '+authToken;
+  const res = await fetch(API_BASE+path, Object.assign({}, opts, {headers}));
+  if(!res.ok){
+    let detail = 'Request failed';
+    try{ const j = await res.json(); detail = j.error || j.detail || detail; }catch(e){}
+    throw new Error(detail);
+  }
+  if(res.status===204) return null;
+  return res.json();
+}
+
+function setSession(token, user){
+  authToken = token; currentUser = user;
+  localStorage.setItem('aiq_token', token);
+  localStorage.setItem('aiq_user', JSON.stringify(user));
+  renderAuthStatus();
+}
+function clearSession(){
+  authToken=null; currentUser=null;
+  localStorage.removeItem('aiq_token'); localStorage.removeItem('aiq_user');
+  renderAuthStatus();
+}
+function renderAuthStatus(){
+  const el = document.getElementById('auth-status');
+  const signinBtn = document.getElementById('n-signin');
+  if(currentUser){
+    el.textContent = '👋 '+currentUser.name;
+    signinBtn.textContent = 'Sign Out';
+    signinBtn.onclick = ()=>{ clearSession(); toast('Signed out'); };
+  } else {
+    el.textContent = '';
+    signinBtn.textContent = 'Sign In';
+    signinBtn.onclick = ()=> openAuthModal('login');
+  }
+}
+
+let authMode='login';
+function openAuthModal(mode){
+  authMode = mode;
+  applyAuthMode();
+  document.getElementById('auth-overlay').style.display='flex';
+}
+function closeAuthModal(){
+  document.getElementById('auth-overlay').style.display='none';
+  document.getElementById('auth-error').style.display='none';
+}
+function toggleAuthMode(){ authMode = authMode==='login'?'signup':'login'; applyAuthMode(); }
+function applyAuthMode(){
+  const isLogin = authMode==='login';
+  document.getElementById('auth-modal-title').textContent = isLogin?'Sign In':'Create Account';
+  document.getElementById('auth-name-field').style.display = isLogin?'none':'block';
+  document.getElementById('auth-submit-btn').textContent = isLogin?'Sign In':'Sign Up';
+  document.getElementById('auth-switch-text').textContent = isLogin?"Don't have an account?":'Already have an account?';
+  document.getElementById('auth-switch-link').textContent = isLogin?'Sign up':'Sign in';
+}
+async function submitAuth(){
+  const errEl = document.getElementById('auth-error');
+  errEl.style.display='none';
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const name = document.getElementById('auth-name').value.trim();
+  try{
+    let data;
+    if(authMode==='login'){
+      data = await apiFetch('/auth/login', {method:'POST', body:JSON.stringify({email,password})});
+    } else {
+      if(!name){ throw new Error('Name is required'); }
+      data = await apiFetch('/auth/register', {method:'POST', body:JSON.stringify({name,email,password})});
+    }
+    setSession(data.access_token, data.user);
+    closeAuthModal();
+    toast(authMode==='login' ? 'Welcome back!' : 'Account created!');
+    loadDashboard(); loadAdmin();
+  }catch(e){
+    errEl.textContent = e.message;
+    errEl.style.display='block';
+  }
+}
+
+/* ── NAVIGATION ─────────────────────────────────────────────────────────────*/
+function go(id){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nav-link').forEach(a=>a.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  const n=document.getElementById('n-'+id);
+  if(n)n.classList.add('on');
+  window.scrollTo(0,0);
+}
+function toggleMobileNav(){
+  document.getElementById('mobile-nav').classList.toggle('on');
+  document.getElementById('mb-btn').textContent=document.getElementById('mobile-nav').classList.contains('on')?'✕':'☰';
+}
+
+/* ── TOAST ───────────────────────────────────────────────────────────────────*/
+function toast(msg,dur=2800){
+  const el=document.createElement('div');
+  el.className='toast';el.textContent=msg;
+  document.body.appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .4s';setTimeout(()=>el.remove(),420);},dur);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LIBRARY
+══════════════════════════════════════════════════════════════════════════*/
+const PROJECTS=[
+  {t:'URL Shortener',d:'100M+ redirects/day using consistent hashing, distributed counters, and Redis caching with sub-ms latency.',l:'advanced',time:'3h',stars:'4.8',views:'18.4k',topics:['Hashing','Redis','Zookeeper']},
+  {t:'Real-Time Chat',d:'WhatsApp-style messaging with WebSockets, Kafka fan-out, and end-to-end encryption for 50M concurrent users.',l:'intermediate',time:'4h',stars:'4.7',views:'14.2k',topics:['WebSocket','Kafka','E2EE']},
+  {t:'Rate Limiter Service',d:'Token bucket, sliding window, and fixed-window rate limiting for API protection. Redis-backed, distributed.',l:'beginner',time:'1h',stars:'4.6',views:'22.1k',topics:['Redis','Algorithms','API']},
+  {t:'Distributed Cache',d:'Redis-like system with consistent hashing, LRU eviction, replication, and persistence across 100+ nodes.',l:'advanced',time:'5h',stars:'4.9',views:'11.7k',topics:['Hashing','Replication','LRU']},
+  {t:'Search Autocomplete',d:'Typeahead suggestions using distributed tries, inverted indexes, and prefix caching at 100K QPS.',l:'intermediate',time:'3h',stars:'4.7',views:'9.8k',topics:['Trie','Elasticsearch','Cache']},
+  {t:'Content Delivery Network',d:'Design Cloudflare-style CDN with PoP nodes, BGP Anycast, cache invalidation, and TLS termination.',l:'enterprise',time:'8h',stars:'5.0',views:'6.3k',topics:['CDN','BGP','TLS']},
+  {t:'Payment System',d:'Stripe-like processing with idempotency keys, distributed transactions, ledger design, and fraud ML.',l:'enterprise',time:'10h',stars:'4.9',views:'8.9k',topics:['Transactions','Kafka','Idempotency']},
+  {t:'Social Media Feed',d:'Facebook-style news feed with fan-out-on-write vs read, ML ranking, pagination, and ad injection.',l:'intermediate',time:'4h',stars:'4.8',views:'15.6k',topics:['Fan-out','Ranking','Caching']},
+  {t:'File Storage Service',d:'S3-like object store with chunking, deduplication, cross-region replication, and presigned URLs.',l:'advanced',time:'6h',stars:'4.8',views:'10.2k',topics:['S3','Replication','Chunking']},
+  {t:'Web Crawler',d:'Distributed BFS crawler with URL frontier, politeness policies, Bloom filter dedup, and Kafka coordination.',l:'advanced',time:'5h',stars:'4.7',views:'8.4k',topics:['BFS','Bloom Filter','Kafka']},
+  {t:'Push Notification Service',d:'Multi-channel push (iOS, Android, email, SMS) with at-least-once delivery guarantees and templating.',l:'beginner',time:'2h',stars:'4.6',views:'19.8k',topics:['FCM','APNS','Kafka']},
+  {t:'Ride Matching System',d:'Uber-like geospatial matching with H3/QuadTree indexing, ETA prediction, and surge pricing ML.',l:'enterprise',time:'9h',stars:'4.9',views:'7.1k',topics:['Geo','QuadTree','WebSocket']},
+  {t:'Video Streaming Platform',d:'YouTube-like architecture: ABR encoding pipeline, CDN distribution, comment system, and recommendations.',l:'enterprise',time:'12h',stars:'5.0',views:'5.8k',topics:['HLS','CDN','Encoding']},
+  {t:'API Gateway',d:'Custom gateway with routing, auth middleware, rate limiting, circuit breaking, and request tracing.',l:'intermediate',time:'3.5h',stars:'4.7',views:'12.3k',topics:['Proxy','Auth','Tracing']},
+  {t:'Distributed Job Scheduler',d:'Celery/Airflow-like scheduler with cron jobs, DAG dependencies, retries, and distributed workers.',l:'intermediate',time:'4h',stars:'4.6',views:'9.2k',topics:['DAG','Redis','Workers']},
+  {t:'Pub/Sub Message Broker',d:'Kafka-like broker with partitioning, consumer groups, at-least-once delivery, and compacted topics.',l:'advanced',time:'6h',stars:'4.8',views:'8.7k',topics:['Partitioning','Replication','Offsets']},
+  {t:'Distributed ID Generator',d:'Snowflake-style unique ID generation across distributed nodes without coordination overhead.',l:'beginner',time:'1.5h',stars:'4.7',views:'25.4k',topics:['Snowflake','Clocks','UUID']},
+  {t:'E-Commerce Order System',d:'Full order lifecycle with saga-pattern distributed transactions, inventory reservation, and fulfillment.',l:'advanced',time:'7h',stars:'4.8',views:'9.3k',topics:['Saga','Events','ACID']},
+];
+let libF='all';
+function setLibF(f,el){
+  libF=f;
+  document.querySelectorAll('#library .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');renderLib();
+}
+function renderLib(){
+  const q=document.getElementById('lib-q').value.toLowerCase();
+  const cls={beginner:'t-b',intermediate:'t-i',advanced:'t-a',enterprise:'t-e'};
+  const lbl={beginner:'Beginner',intermediate:'Intermediate',advanced:'Advanced',enterprise:'Enterprise'};
+  const filtered=PROJECTS.filter(p=>(libF==='all'||p.l===libF)&&(!q||p.t.toLowerCase().includes(q)||p.d.toLowerCase().includes(q)));
+  document.getElementById('lib-grid').innerHTML = filtered.length===0
+    ? `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text3);">No projects match your search.</div>`
+    : filtered.map(p=>`
+    <div class="card">
+      <span class="tag ${cls[p.l]}">${lbl[p.l]}</span>
+      <div style="font-family:var(--fd);font-size:1rem;font-weight:700;color:#fff;margin-bottom:.38rem;">${p.t}</div>
+      <p style="font-size:12.5px;color:var(--text2);line-height:1.62;">${p.d}</p>
+      <div class="topic-chips">${p.topics.map(t=>`<span class="tc">${t}</span>`).join('')}</div>
+      <div class="card-foot"><span class="cm">⏱ ${p.time}</span><span class="cm">★ ${p.stars}</span><span class="cm">👁 ${p.views}</span><span style="margin-left:auto;color:var(--accent2);">→</span></div>
+    </div>`).join('');
+}
+renderLib();
+
+async function loadProjectsFromApi(){
+  try{
+    const data = await apiFetch('/projects');
+    if(Array.isArray(data) && data.length){
+      PROJECTS.length = 0;
+      data.forEach(p=>PROJECTS.push({
+        id:p.id, t:p.title, d:p.description, l:p.level, time:p.time_estimate,
+        stars:String(p.stars), views:formatViews(p.views), topics:p.topics
+      }));
+      renderLib();
+    }
+  }catch(e){ /* keep static fallback data */ }
+}
+function formatViews(n){ return n>=1000 ? (n/1000).toFixed(1)+'k' : String(n); }
+loadProjectsFromApi();
+
+/* ══════════════════════════════════════════════════════════════════════════
+   BUILDER — full drag, drop, connect, template, save
+══════════════════════════════════════════════════════════════════════════*/
+let nodes=[], edges=[], dragData=null, connMode=false, connFirst=null, nodeSeq=0;
+
+// Drag from palette
+document.querySelectorAll('.comp-btn[draggable]').forEach(btn=>{
+  btn.addEventListener('dragstart',e=>{
+    dragData={c:btn.dataset.c, e:btn.dataset.e};
+  });
+});
+
+const bcanvas=document.getElementById('bcanvas');
+bcanvas.addEventListener('dragover',e=>e.preventDefault());
+bcanvas.addEventListener('drop',e=>{
+  e.preventDefault();
+  if(!dragData)return;
+  const r=bcanvas.getBoundingClientRect();
+  const x=Math.max(4, e.clientX-r.left-55);
+  const y=Math.max(44, e.clientY-r.top-16);
+  addNode(dragData.c, dragData.e, x, y);
+  dragData=null;
+});
+
+function addNode(name,emoji,x,y){
+  document.getElementById('canvas-hint').style.display='none';
+  const id='nd_'+(++nodeSeq);
+  const el=document.createElement('div');
+  el.className='placed'; el.id=id;
+  el.style.left=x+'px'; el.style.top=y+'px';
+  el.innerHTML=`<span>${emoji}</span><span>${name}</span><span class="del" onclick="removeNode('${id}')">✕</span>`;
+  if(connMode) el.addEventListener('click',()=>handleConnClick(id));
+  makeDraggable(el,id);
+  document.getElementById('canvas-nodes').appendChild(el);
+  nodes.push({id,name,emoji,x,y});
+  updateInfo();
+}
+
+function makeDraggable(el, id){
+  let sx,sy,moving=false;
+  el.addEventListener('mousedown',e=>{
+    if(e.target.classList.contains('del'))return;
+    if(connMode){handleConnClick(id);return;}
+    e.preventDefault();
+    sx=e.clientX-el.offsetLeft; sy=e.clientY-el.offsetTop;
+    moving=true;
+    document.addEventListener('mousemove',mm);
+    document.addEventListener('mouseup',mu);
+  });
+  function mm(e){
+    if(!moving)return;
+    const nx=Math.max(0,e.clientX-sx);
+    const ny=Math.max(44,e.clientY-sy);
+    el.style.left=nx+'px'; el.style.top=ny+'px';
+    const n=nodes.find(n=>n.id===id);
+    if(n){n.x=nx;n.y=ny;}
+    renderEdges();
+  }
+  function mu(){moving=false;document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);}
+}
+
+function handleConnClick(id){
+  if(!connFirst){
+    connFirst=id;
+    document.getElementById(id).classList.add('sel');
+    showConnStatus(`Select second node to connect from <strong>${nodes.find(n=>n.id===id).name}</strong>`);
+  } else {
+    if(connFirst===id){connFirst=null;clearSelNodes();showConnStatus('');return;}
+    // Check duplicate
+    if(!edges.find(e=>(e.a===connFirst&&e.b===id)||(e.a===id&&e.b===connFirst))){
+      edges.push({a:connFirst,b:id,id:'e'+(Date.now())});
+      renderEdges();
+      toast('Connection added');
+    }
+    document.getElementById(connFirst)?.classList.remove('sel');
+    connFirst=null;
+    showConnStatus('Click a node to start a new connection');
+  }
+}
+
+function showConnStatus(msg){
+  const el=document.getElementById('conn-status');
+  el.style.display=msg?'block':'none';
+  el.innerHTML=msg;
+}
+function clearSelNodes(){document.querySelectorAll('.placed.sel').forEach(n=>n.classList.remove('sel'));}
+
+function renderEdges(){
+  const svg=document.getElementById('canvas-svg');
+  svg.innerHTML='<defs><marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="rgba(99,180,255,0.55)"/></marker></defs>';
+  edges.forEach(e=>{
+    const na=nodes.find(n=>n.id===e.a);
+    const nb=nodes.find(n=>n.id===e.b);
+    if(!na||!nb)return;
+    const ea=document.getElementById(e.a);
+    const eb=document.getElementById(e.b);
+    if(!ea||!eb)return;
+    const x1=na.x+(ea.offsetWidth||90)/2;
+    const y1=na.y+(ea.offsetHeight||30)/2;
+    const x2=nb.x+(eb.offsetWidth||90)/2;
+    const y2=nb.y+(eb.offsetHeight||30)/2;
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',x1);line.setAttribute('y1',y1);
+    line.setAttribute('x2',x2);line.setAttribute('y2',y2);
+    line.setAttribute('stroke','rgba(99,180,255,0.45)');
+    line.setAttribute('stroke-width','1.5');
+    line.setAttribute('stroke-dasharray','5 3');
+    line.setAttribute('marker-end','url(#ah)');
+    line.style.animation='flow 2s linear infinite';
+    svg.appendChild(line);
+  });
+}
+
+function toggleConnMode(){
+  connMode=!connMode;
+  connFirst=null;clearSelNodes();
+  document.getElementById('bcanvas').classList.toggle('conn-mode',connMode);
+  const btn=document.getElementById('conn-btn');
+  btn.textContent=connMode?'🔗 Connecting…':'🔗 Connect';
+  btn.style.borderColor=connMode?'var(--accent2)':'';
+  btn.style.color=connMode?'var(--accent3)':'';
+  showConnStatus(connMode?'Click a node to start connecting':'');
+}
+
+function clearConnections(){edges=[];renderEdges();toast('Connections cleared');}
+
+function removeNode(id){
+  document.getElementById(id)?.remove();
+  nodes=nodes.filter(n=>n.id!==id);
+  edges=edges.filter(e=>e.a!==id&&e.b!==id);
+  renderEdges();
+  if(nodes.length===0)document.getElementById('canvas-hint').style.display='flex';
+  updateInfo();
+}
+
+function clearCanvas(){
+  document.getElementById('canvas-nodes').innerHTML='';
+  document.getElementById('canvas-svg').innerHTML='';
+  nodes=[];edges=[];nodeSeq=0;connFirst=null;connMode=false;
+  document.getElementById('bcanvas').classList.remove('conn-mode');
+  document.getElementById('conn-btn').textContent='🔗 Connect';
+  document.getElementById('conn-btn').style.borderColor='';
+  document.getElementById('conn-btn').style.color='';
+  document.getElementById('canvas-hint').style.display='flex';
+  showConnStatus('');
+  updateInfo();
+}
+function updateInfo(){
+  document.getElementById('canvas-info').textContent=nodes.length+' node'+(nodes.length!==1?'s':'')+', '+edges.length+' connection'+(edges.length!==1?'s':'');
+}
+function undoNode(){if(nodes.length){removeNode(nodes[nodes.length-1].id);}}
+async function saveArch(){
+  const nm=prompt('Architecture name:','My Architecture '+Date.now().toString().slice(-4));
+  if(!nm)return;
+  const sl=document.getElementById('saved-archs');
+  const d=document.createElement('div');
+  d.className='saved-item';
+  d.innerHTML=`<span style="font-size:15px;">💾</span><span style="font-size:13px;font-weight:600;color:var(--text);flex:1;">${nm}</span><span style="font-size:11.5px;color:var(--text3);">${nodes.length} nodes · ${edges.length} connections · just now</span>`;
+  if(!sl.querySelector('.sect-title')){const h=document.createElement('div');h.className='sect-title';h.style.marginBottom='.75rem';h.textContent='Saved Architectures';sl.prepend(h);}
+  sl.appendChild(d);
+  if(currentUser){
+    try{
+      await apiFetch('/dashboard/architectures', {method:'POST', body:JSON.stringify({name:nm, nodes, edges})});
+      toast('Architecture saved to your account!');
+      loadDashboard();
+      return;
+    }catch(e){ /* fall through to local-only save */ }
+  }
+  toast('Architecture saved! (sign in to save to your account)');
+}
+function exportArch(){
+  const out={nodes:nodes.map(n=>({name:n.name,emoji:n.emoji})),edges:edges.map(e=>({from:nodes.find(n=>n.id===e.a)?.name,to:nodes.find(n=>n.id===e.b)?.name}))};
+  toast('Export:\n'+JSON.stringify(out,null,2).slice(0,120)+'…');
+}
+
+// Templates
+const TPLS={
+  micro:[{c:'CDN',e:'🌐',x:190,y:55},{c:'Load Balancer',e:'⚖️',x:190,y:120},{c:'API Gateway',e:'🔀',x:190,y:188},{c:'Auth Service',e:'🔐',x:50,y:270},{c:'User Service',e:'⚙️',x:190,y:270},{c:'Feed Service',e:'⚙️',x:330,y:270},{c:'Cache',e:'⚡',x:50,y:355},{c:'Database',e:'🗄️',x:190,y:355},{c:'Message Queue',e:'📨',x:330,y:355},{c:'Monitoring',e:'📊',x:390,y:120}],
+  event:[{c:'API Gateway',e:'🔀',x:165,y:55},{c:'Message Queue',e:'📨',x:165,y:140},{c:'Worker A',e:'⚙️',x:45,y:230},{c:'Worker B',e:'⚙️',x:165,y:230},{c:'Worker C',e:'⚙️',x:285,y:230},{c:'Database',e:'🗄️',x:100,y:320},{c:'Cache',e:'⚡',x:245,y:320}],
+  chat:[{c:'CDN',e:'🌐',x:195,y:50},{c:'Load Balancer',e:'⚖️',x:195,y:120},{c:'Auth Service',e:'🔐',x:60,y:200},{c:'Chat Service',e:'⚙️',x:195,y:200},{c:'Notification',e:'📊',x:330,y:200},{c:'Message Queue',e:'📨',x:195,y:285},{c:'Database',e:'🗄️',x:80,y:370},{c:'Cache',e:'⚡',x:220,y:370},{c:'Storage',e:'💾',x:360,y:285}],
+  cdn:[{c:'DNS',e:'🛜',x:190,y:50},{c:'CDN',e:'🌐',x:190,y:120},{c:'Load Balancer',e:'⚖️',x:190,y:200},{c:'API Gateway',e:'🔀',x:190,y:280},{c:'Rate Limiter',e:'🚦',x:50,y:280},{c:'Microservice',e:'⚙️',x:100,y:370},{c:'Microservice',e:'⚙️',x:280,y:370},{c:'Monitoring',e:'📊',x:370,y:200}],
+};
+const TPL_EDGES={
+  micro:[[0,1],[1,2],[2,3],[2,4],[2,5],[3,6],[4,7],[5,8]],
+  event:[[0,1],[1,2],[1,3],[1,4],[2,5],[3,5],[4,6]],
+  chat:[[0,1],[1,2],[1,3],[1,4],[3,5],[5,6],[5,7],[3,8]],
+  cdn:[[0,1],[1,2],[2,4],[2,3],[3,5],[3,6],[2,7]],
+};
+function loadTpl(k){
+  clearCanvas();
+  TPLS[k].forEach(n=>addNode(n.c,n.e,n.x,n.y));
+  // Add edges after DOM settles
+  setTimeout(()=>{
+    (TPL_EDGES[k]||[]).forEach(([ai,bi])=>{
+      const na=nodes[ai],nb=nodes[bi];
+      if(na&&nb) edges.push({a:na.id,b:nb.id,id:'e'+(Date.now()+Math.random())});
+    });
+    renderEdges();updateInfo();
+  },60);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   CASE STUDIES
+══════════════════════════════════════════════════════════════════════════*/
+const CASES={
+  netflix:{name:'🎬 Netflix',tabs:['Overview','Architecture','Database','API Design','Trade-offs'],
+  content:[
+    `<div class="info-grid"><div class="info-card"><div class="info-n" style="color:var(--accent2);">200M+</div><div class="info-l">Subscribers</div></div><div class="info-card"><div class="info-n" style="color:var(--em);">1B hrs</div><div class="info-l">Watched/day</div></div><div class="info-card"><div class="info-n" style="color:var(--am);">15%</div><div class="info-l">Global bandwidth</div></div></div><p style="color:var(--text2);font-size:13.5px;line-height:1.8;margin-bottom:1rem;">Netflix serves 200M+ subscribers across 190 countries, built entirely on AWS using 1000+ microservices. Key innovations: Open Connect CDN, Chaos Engineering, and adaptive bitrate streaming (ABR).</p><ul style="color:var(--text2);font-size:13px;line-height:1.9;padding-left:1.2rem;"><li>1000+ microservices deployed on AWS EC2/ECS/Lambda</li><li>Open Connect CDN — 1000+ PoPs embedded inside ISP networks</li><li>Chaos Monkey & Simian Army for continuous resilience testing</li><li>ABR streaming optimizes quality per device and network condition</li><li>EVCache (memcached ring) for sub-ms personalization reads</li></ul>`,
+    `<div class="arch-box"><svg viewBox="0 0 560 270" xmlns="http://www.w3.org/2000/svg" style="width:100%"><rect x="180" y="8" width="200" height="28" rx="6" fill="rgba(6,182,212,.14)" stroke="rgba(6,182,212,.38)" stroke-width="1"/><text x="280" y="27" fill="#67e8f9" font-size="11" text-anchor="middle" font-family="DM Sans" font-weight="600">Open Connect CDN</text><rect x="180" y="58" width="200" height="28" rx="6" fill="rgba(59,130,246,.14)" stroke="rgba(59,130,246,.38)" stroke-width="1"/><text x="280" y="77" fill="#93c5fd" font-size="11" text-anchor="middle" font-family="DM Sans" font-weight="600">API Gateway (Zuul)</text><rect x="30" y="118" width="140" height="26" rx="6" fill="rgba(16,185,129,.11)" stroke="rgba(16,185,129,.32)" stroke-width="1"/><text x="100" y="135" fill="#6ee7b7" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">Recommendation Svc</text><rect x="210" y="118" width="140" height="26" rx="6" fill="rgba(16,185,129,.11)" stroke="rgba(16,185,129,.32)" stroke-width="1"/><text x="280" y="135" fill="#6ee7b7" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">Streaming Service</text><rect x="390" y="118" width="140" height="26" rx="6" fill="rgba(16,185,129,.11)" stroke="rgba(16,185,129,.32)" stroke-width="1"/><text x="460" y="135" fill="#6ee7b7" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">User Service</text><rect x="30" y="184" width="110" height="24" rx="5" fill="rgba(245,158,11,.11)" stroke="rgba(245,158,11,.28)" stroke-width="1"/><text x="85" y="200" fill="#fcd34d" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">EVCache (Redis)</text><rect x="215" y="184" width="110" height="24" rx="5" fill="rgba(245,158,11,.11)" stroke="rgba(245,158,11,.28)" stroke-width="1"/><text x="270" y="200" fill="#fcd34d" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Cassandra</text><rect x="395" y="184" width="110" height="24" rx="5" fill="rgba(245,158,11,.11)" stroke="rgba(245,158,11,.28)" stroke-width="1"/><text x="450" y="200" fill="#fcd34d" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">MySQL (RDS)</text><rect x="185" y="238" width="190" height="22" rx="5" fill="rgba(139,92,246,.11)" stroke="rgba(139,92,246,.28)" stroke-width="1"/><text x="280" y="253" fill="#c4b5fd" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Apache Kafka Event Bus</text><line x1="280" y1="36" x2="280" y2="58" stroke="rgba(99,180,255,.38)" stroke-width="1" stroke-dasharray="4 2"/><line x1="230" y1="86" x2="100" y2="118" stroke="rgba(99,180,255,.28)" stroke-width="1" stroke-dasharray="4 2"/><line x1="280" y1="86" x2="280" y2="118" stroke="rgba(99,180,255,.28)" stroke-width="1" stroke-dasharray="4 2"/><line x1="330" y1="86" x2="460" y2="118" stroke="rgba(99,180,255,.28)" stroke-width="1" stroke-dasharray="4 2"/><line x1="100" y1="144" x2="85" y2="184" stroke="rgba(99,180,255,.18)" stroke-width="1"/><line x1="280" y1="144" x2="270" y2="184" stroke="rgba(99,180,255,.18)" stroke-width="1"/><line x1="460" y1="144" x2="450" y2="184" stroke="rgba(99,180,255,.18)" stroke-width="1"/><line x1="280" y1="208" x2="280" y2="238" stroke="rgba(139,92,246,.28)" stroke-width="1" stroke-dasharray="4 2"/></svg></div>`,
+    `<div class="code-b"><span class="cmt">// Polyglot persistence strategy</span><br><br><span class="cmt">// Viewing history (Cassandra)</span><br>Partition: userId | Clustering: watched_at DESC<br>No SPOF, handles write-heavy time-series<br><br><span class="cmt">// Billing & accounts (MySQL RDS, Multi-AZ)</span><br>Strong ACID for subscription transactions<br><br><span class="cmt">// Personalization cache (EVCache / memcached)</span><br>~95% hit rate, sub-ms reads, 700M+ items<br><br><span class="cmt">// Analytics + ML training (S3 + Spark)</span><br>Petabyte data lake, Redshift for BI queries</div>`,
+    `<div class="code-b"><span class="cmt">// All APIs behind Zuul gateway + Hystrix</span><br>GET /api/v3/users/:id/recommendations<br>  → EVCache check → Recommendation ML model<br><br>POST /api/v3/streaming/start<br>  → License validation → CDN node selection<br>  → ABR manifest URL + signed token<br><br>GET /api/v3/title/:id/streams<br>  → Content metadata → Available bitrates<br>  → HLS/DASH manifest (240p → 4K HDR)<br><br><span class="cmt">// Circuit breaker: fallback → cached response</span></div>`,
+    `<div class="to-grid"><div class="to-box to-y"><div style="color:var(--em);font-weight:700;margin-bottom:.5rem;font-size:13.5px;">✓ What Worked</div><ul class="to-list"><li>AP over CP — availability wins at scale</li><li>Eventual consistency for watch history</li><li>Circuit breakers prevent cascade failures</li><li>Open Connect reduces transit cost ~80%</li><li>Chaos Engineering finds bugs before users do</li></ul></div><div class="to-box to-n"><div style="color:var(--rose);font-weight:700;margin-bottom:.5rem;font-size:13.5px;">⚠ Challenges</div><ul class="to-list"><li>1000+ services = complex dependency graph</li><li>Distributed tracing overhead is significant</li><li>Data consistency across services is hard</li><li>Cold starts on Lambda spikes during rush hour</li><li>Cost optimization at petabyte scale</li></ul></div></div>`,
+  ]},
+  youtube:{name:'▶️ YouTube',tabs:['Overview','Architecture','Database','API Design','Trade-offs'],
+  content:[
+    `<div class="info-grid"><div class="info-card"><div class="info-n" style="color:var(--accent2);">2.7B</div><div class="info-l">Monthly Users</div></div><div class="info-card"><div class="info-n" style="color:var(--em);">500 hrs</div><div class="info-l">Uploaded/min</div></div><div class="info-card"><div class="info-n" style="color:var(--am);">1B hrs</div><div class="info-l">Watched/day</div></div></div><p style="color:var(--text2);font-size:13.5px;line-height:1.8;margin-bottom:1rem;">YouTube handles 500 hours of video uploaded every minute on Google's private infrastructure: Colossus (distributed FS), Bigtable, Spanner, and a custom video transcoding pipeline. It routes traffic over Google's private fiber backbone, bypassing the public internet.</p><ul style="color:var(--text2);font-size:13px;line-height:1.9;padding-left:1.2rem;"><li>Videos transcoded into 10+ formats/resolutions (DASH + HLS)</li><li>Global CDN with 100+ PoPs using Google's private network backbone</li><li>Google Bigtable for video metadata and user watch history</li><li>Vitess (MySQL sharding proxy) for comments, likes, subscriptions</li><li>Google Pub/Sub for event streaming — views, analytics, notifications</li></ul>`,
+    `<div class="arch-box"><svg viewBox="0 0 560 270" xmlns="http://www.w3.org/2000/svg" style="width:100%"><rect x="165" y="8" width="120" height="26" rx="6" fill="rgba(6,182,212,.14)" stroke="rgba(6,182,212,.38)" stroke-width="1"/><text x="225" y="25" fill="#67e8f9" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">Upload API</text><rect x="320" y="8" width="120" height="26" rx="6" fill="rgba(6,182,212,.14)" stroke="rgba(6,182,212,.38)" stroke-width="1"/><text x="380" y="25" fill="#67e8f9" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">Playback API</text><rect x="40" y="65" width="130" height="26" rx="6" fill="rgba(139,92,246,.14)" stroke="rgba(139,92,246,.38)" stroke-width="1"/><text x="105" y="82" fill="#c4b5fd" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">Transcoding Pipeline</text><rect x="215" y="65" width="130" height="26" rx="6" fill="rgba(59,130,246,.14)" stroke="rgba(59,130,246,.38)" stroke-width="1"/><text x="280" y="82" fill="#93c5fd" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">API Gateway</text><rect x="390" y="65" width="130" height="26" rx="6" fill="rgba(16,185,129,.11)" stroke="rgba(16,185,129,.32)" stroke-width="1"/><text x="455" y="82" fill="#6ee7b7" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">Recommendation Svc</text><rect x="40" y="128" width="110" height="24" rx="5" fill="rgba(245,158,11,.11)" stroke="rgba(245,158,11,.28)" stroke-width="1"/><text x="95" y="144" fill="#fcd34d" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Google Colossus</text><rect x="175" y="128" width="110" height="24" rx="5" fill="rgba(245,158,11,.11)" stroke="rgba(245,158,11,.28)" stroke-width="1"/><text x="230" y="144" fill="#fcd34d" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Bigtable</text><rect x="310" y="128" width="110" height="24" rx="5" fill="rgba(245,158,11,.11)" stroke="rgba(245,158,11,.28)" stroke-width="1"/><text x="365" y="144" fill="#fcd34d" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Spanner (SQL)</text><rect x="445" y="128" width="90" height="24" rx="5" fill="rgba(244,63,94,.11)" stroke="rgba(244,63,94,.28)" stroke-width="1"/><text x="490" y="144" fill="#fda4af" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Memcache</text><rect x="150" y="195" width="270" height="22" rx="5" fill="rgba(139,92,246,.11)" stroke="rgba(139,92,246,.28)" stroke-width="1"/><text x="285" y="210" fill="#c4b5fd" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Google Pub/Sub (Event Bus)</text><rect x="150" y="235" width="270" height="22" rx="5" fill="rgba(6,182,212,.11)" stroke="rgba(6,182,212,.28)" stroke-width="1"/><text x="285" y="250" fill="#67e8f9" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Google CDN / Edge PoPs</text><line x1="225" y1="34" x2="105" y2="65" stroke="rgba(99,180,255,.28)" stroke-width="1" stroke-dasharray="4 2"/><line x1="225" y1="34" x2="280" y2="65" stroke="rgba(99,180,255,.28)" stroke-width="1" stroke-dasharray="4 2"/><line x1="380" y1="34" x2="280" y2="65" stroke="rgba(99,180,255,.28)" stroke-width="1" stroke-dasharray="4 2"/><line x1="380" y1="34" x2="455" y2="65" stroke="rgba(99,180,255,.28)" stroke-width="1" stroke-dasharray="4 2"/><line x1="105" y1="91" x2="95" y2="128" stroke="rgba(99,180,255,.18)" stroke-width="1"/><line x1="280" y1="91" x2="230" y2="128" stroke="rgba(99,180,255,.18)" stroke-width="1"/><line x1="280" y1="91" x2="365" y2="128" stroke="rgba(99,180,255,.18)" stroke-width="1"/><line x1="455" y1="91" x2="490" y2="128" stroke="rgba(99,180,255,.18)" stroke-width="1"/></svg></div>`,
+    `<div class="code-b"><span class="cmt">// Video metadata (Bigtable)</span><br>Row key: videoId<br>Cols: title, description, tags,<br>      thumbnailUrl, uploadedAt, views<br><br><span class="cmt">// Video chunks (Google Colossus / GCS)</span><br>256MB blocks · 3x replication<br>Formats: MP4 (H.264/H.265/AV1), WebM<br>Resolutions: 144p → 8K<br><br><span class="cmt">// Comments & likes (Vitess / MySQL sharding)</span><br>Shard key: videoId % num_shards<br>Tables: comments, likes, subscriptions</div>`,
+    `<div class="code-b">POST /upload/video<br>  → Generate resumable upload session<br>  → Client streams chunks directly<br>  → Pub/Sub event → transcoding workers<br><br>GET /watch?v=:videoId<br>  → Memcache check → Bigtable metadata<br>  → CDN-signed URL for video chunks<br>  → DASH/HLS adaptive manifest<br><br>GET /api/v1/recommendations?userId=:id<br>  → Collaborative filtering → watch history<br>  → Ranked results with diversity injection</div>`,
+    `<div class="to-grid"><div class="to-box to-y"><div style="color:var(--em);font-weight:700;margin-bottom:.5rem;font-size:13.5px;">✓ What Worked</div><ul class="to-list"><li>Google Colossus = effectively infinite storage</li><li>Spanner for globally consistent relational SQL</li><li>AV1 codec reduces bandwidth by ~30%</li><li>Resumable uploads prevent re-upload on failure</li><li>Private backbone reduces latency by ~40%</li></ul></div><div class="to-box to-n"><div style="color:var(--rose);font-weight:700;margin-bottom:.5rem;font-size:13.5px;">⚠ Challenges</div><ul class="to-list"><li>Transcoding 500hrs/min is enormously costly</li><li>View count accuracy vs performance tradeoff</li><li>Recommendation cold-start for new creators</li><li>Copyright detection at upload scale (Content ID)</li><li>Live streaming latency vs VOD architecture</li></ul></div></div>`,
+  ]},
+  uber:{name:'🚗 Uber',tabs:['Overview','Architecture','Database','API Design','Trade-offs'],
+  content:[
+    `<div class="info-grid"><div class="info-card"><div class="info-n" style="color:var(--accent2);">130M</div><div class="info-l">Monthly Users</div></div><div class="info-card"><div class="info-n" style="color:var(--em);">19M</div><div class="info-l">Trips/day</div></div><div class="info-card"><div class="info-n" style="color:var(--am);">6M</div><div class="info-l">Active Drivers</div></div></div><p style="color:var(--text2);font-size:13.5px;line-height:1.8;margin-bottom:1rem;">Uber solves one of the hardest distributed systems problems: real-time geospatial matching at global scale. Their DISCO dispatch system matches riders and drivers in under 30 seconds across 10,000+ cities using a hexagonal H3 grid.</p><ul style="color:var(--text2);font-size:13px;line-height:1.9;padding-left:1.2rem;"><li>H3 hexagonal grid (by Uber) replaces QuadTree for better uniformity</li><li>DISCO dispatch engine built on top of H3 spatial indexing</li><li>Kafka for real-time location event streaming at millions of events/sec</li><li>Apache Cassandra for trip and driver location history</li><li>RING surge pricing — ML model to dynamically balance supply/demand</li></ul>`,
+    `<div class="arch-box"><svg viewBox="0 0 560 270" xmlns="http://www.w3.org/2000/svg" style="width:100%"><rect x="190" y="8" width="180" height="26" rx="6" fill="rgba(59,130,246,.14)" stroke="rgba(59,130,246,.38)" stroke-width="1"/><text x="280" y="25" fill="#93c5fd" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">API Gateway / Load Balancer</text><rect x="30" y="60" width="130" height="26" rx="6" fill="rgba(16,185,129,.11)" stroke="rgba(16,185,129,.32)" stroke-width="1"/><text x="95" y="77" fill="#6ee7b7" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">Location Service</text><rect x="215" y="60" width="130" height="26" rx="6" fill="rgba(16,185,129,.11)" stroke="rgba(16,185,129,.32)" stroke-width="1"/><text x="280" y="77" fill="#6ee7b7" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">Dispatch (DISCO)</text><rect x="400" y="60" width="130" height="26" rx="6" fill="rgba(16,185,129,.11)" stroke="rgba(16,185,129,.32)" stroke-width="1"/><text x="465" y="77" fill="#6ee7b7" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">Trip Service</text><rect x="30" y="120" width="130" height="24" rx="5" fill="rgba(244,63,94,.11)" stroke="rgba(244,63,94,.28)" stroke-width="1"/><text x="95" y="136" fill="#fda4af" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Redis Geo Index</text><rect x="215" y="120" width="130" height="24" rx="5" fill="rgba(244,63,94,.11)" stroke="rgba(244,63,94,.28)" stroke-width="1"/><text x="280" y="136" fill="#fda4af" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">H3 Grid / QuadTree</text><rect x="400" y="120" width="130" height="24" rx="5" fill="rgba(245,158,11,.11)" stroke="rgba(245,158,11,.28)" stroke-width="1"/><text x="465" y="136" fill="#fcd34d" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Cassandra (Trips)</text><rect x="130" y="183" width="310" height="22" rx="5" fill="rgba(139,92,246,.11)" stroke="rgba(139,92,246,.28)" stroke-width="1"/><text x="285" y="198" fill="#c4b5fd" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Kafka (Location Events Stream)</text><rect x="130" y="223" width="145" height="22" rx="5" fill="rgba(59,130,246,.11)" stroke="rgba(59,130,246,.28)" stroke-width="1"/><text x="203" y="238" fill="#93c5fd" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Surge Pricing ML (RING)</text><rect x="295" y="223" width="145" height="22" rx="5" fill="rgba(59,130,246,.11)" stroke="rgba(59,130,246,.28)" stroke-width="1"/><text x="368" y="238" fill="#93c5fd" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">ETA Prediction ML</text><line x1="280" y1="34" x2="95" y2="60" stroke="rgba(99,180,255,.28)" stroke-width="1" stroke-dasharray="4 2"/><line x1="280" y1="34" x2="280" y2="60" stroke="rgba(99,180,255,.28)" stroke-width="1" stroke-dasharray="4 2"/><line x1="280" y1="34" x2="465" y2="60" stroke="rgba(99,180,255,.28)" stroke-width="1" stroke-dasharray="4 2"/><line x1="95" y1="86" x2="95" y2="120" stroke="rgba(99,180,255,.18)" stroke-width="1"/><line x1="280" y1="86" x2="280" y2="120" stroke="rgba(99,180,255,.18)" stroke-width="1"/><line x1="465" y1="86" x2="465" y2="120" stroke="rgba(99,180,255,.18)" stroke-width="1"/></svg></div>`,
+    `<div class="code-b"><span class="cmt">// Driver locations (Redis Geo + Cassandra)</span><br>Redis GEOADD drivers:city lon lat driverId<br>Redis GEORADIUS → nearest drivers within 3km<br>TTL: 30s (driver pings to stay "online")<br><br><span class="cmt">// Trip data (Cassandra)</span><br>Partition: city_id | Clustering: created_at DESC<br>Cols: rider_id, driver_id, pickup, dropoff,<br>      status, fare, route, rating<br><br><span class="cmt">// Surge state (in-memory per city)</span><br>demand/supply ratio → surge_multiplier<br>Updated every 60s via Kafka aggregation</div>`,
+    `<div class="code-b">POST /v2/requests<br>  → Auth → Rider location<br>  → DISCO dispatch → H3 cell lookup<br>  → Driver match (ETA + rating + acceptance)<br>  → WebSocket push to driver & rider<br><br>GET /v2/requests/:id/estimate<br>  → ETA ML → Surge multiplier<br>  → Route via OSRM → Price breakdown<br><br>PATCH /v2/drivers/me/status<br>  → Redis Geo update → Kafka event<br>  → Real-time broadcast to nearby riders</div>`,
+    `<div class="to-grid"><div class="to-box to-y"><div style="color:var(--em);font-weight:700;margin-bottom:.5rem;font-size:13.5px;">✓ What Worked</div><ul class="to-list"><li>H3 hexagonal grid beats QuadTree at scale</li><li>Redis Geo for sub-second driver lookup</li><li>Kafka decouples location events cleanly</li><li>CQRS separates trip read/write paths</li><li>Per-city deployment for regulatory isolation</li></ul></div><div class="to-box to-n"><div style="color:var(--rose);font-weight:700;margin-bottom:.5rem;font-size:13.5px;">⚠ Challenges</div><ul class="to-list"><li>GPS drift causes false location events</li><li>Hot spots (airports, events) crush capacity</li><li>Network partitions break real-time matching</li><li>Fraud detection at transaction velocity</li><li>Multi-region consistency for payments</li></ul></div></div>`,
+  ]},
+  whatsapp:{name:'💬 WhatsApp',tabs:['Overview','Architecture','Database','API Design','Trade-offs'],
+  content:[
+    `<div class="info-grid"><div class="info-card"><div class="info-n" style="color:var(--accent2);">2B+</div><div class="info-l">Active Users</div></div><div class="info-card"><div class="info-n" style="color:var(--em);">100B</div><div class="info-l">Messages/day</div></div><div class="info-card"><div class="info-n" style="color:var(--am);">~50</div><div class="info-l">Engineers (2014)</div></div></div><p style="color:var(--text2);font-size:13.5px;line-height:1.8;margin-bottom:1rem;">WhatsApp achieved 2B+ users with only ~50 engineers at acquisition — the most efficient architecture ever built. It's powered by Erlang/OTP (BEAM VM) which can run millions of lightweight concurrent processes, and uses the Signal Protocol for end-to-end encryption.</p><ul style="color:var(--text2);font-size:13px;line-height:1.9;padding-left:1.2rem;"><li>Erlang/BEAM: millions of concurrent lightweight processes per server</li><li>Signal Protocol for E2EE — server never sees plaintext messages</li><li>Mnesia distributed DB for session state (in-memory, microsecond reads)</li><li>FreeBSD + epoll tuned to 1M+ concurrent connections per node</li><li>Message queues for offline delivery and multi-device sync</li></ul>`,
+    `<div class="arch-box"><svg viewBox="0 0 560 260" xmlns="http://www.w3.org/2000/svg" style="width:100%"><rect x="190" y="8" width="180" height="26" rx="6" fill="rgba(37,211,102,.11)" stroke="rgba(37,211,102,.32)" stroke-width="1"/><text x="280" y="25" fill="#4ade80" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">Client (Signal Protocol)</text><rect x="190" y="56" width="180" height="26" rx="6" fill="rgba(59,130,246,.14)" stroke="rgba(59,130,246,.38)" stroke-width="1"/><text x="280" y="73" fill="#93c5fd" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">Load Balancer</text><rect x="30" y="112" width="130" height="26" rx="6" fill="rgba(16,185,129,.11)" stroke="rgba(16,185,129,.32)" stroke-width="1"/><text x="95" y="129" fill="#6ee7b7" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">XMPP (Ejabberd)</text><rect x="215" y="112" width="130" height="26" rx="6" fill="rgba(16,185,129,.11)" stroke="rgba(16,185,129,.32)" stroke-width="1"/><text x="280" y="129" fill="#6ee7b7" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">Media Service</text><rect x="400" y="112" width="130" height="26" rx="6" fill="rgba(16,185,129,.11)" stroke="rgba(16,185,129,.32)" stroke-width="1"/><text x="465" y="129" fill="#6ee7b7" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">Notification Svc</text><rect x="30" y="175" width="110" height="24" rx="5" fill="rgba(245,158,11,.11)" stroke="rgba(245,158,11,.28)" stroke-width="1"/><text x="85" y="191" fill="#fcd34d" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Mnesia (Sessions)</text><rect x="165" y="175" width="110" height="24" rx="5" fill="rgba(245,158,11,.11)" stroke="rgba(245,158,11,.28)" stroke-width="1"/><text x="220" y="191" fill="#fcd34d" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Offline Queue</text><rect x="305" y="175" width="110" height="24" rx="5" fill="rgba(59,130,246,.11)" stroke="rgba(59,130,246,.28)" stroke-width="1"/><text x="360" y="191" fill="#93c5fd" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">S3 (Media)</text><rect x="445" y="175" width="90" height="24" rx="5" fill="rgba(244,63,94,.11)" stroke="rgba(244,63,94,.28)" stroke-width="1"/><text x="490" y="191" fill="#fda4af" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">FCM / APNs</text><rect x="150" y="228" width="270" height="22" rx="5" fill="rgba(139,92,246,.11)" stroke="rgba(139,92,246,.28)" stroke-width="1"/><text x="285" y="243" fill="#c4b5fd" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Erlang/OTP BEAM on FreeBSD</text><line x1="280" y1="34" x2="280" y2="56" stroke="rgba(99,180,255,.38)" stroke-width="1" stroke-dasharray="4 2"/><line x1="230" y1="82" x2="95" y2="112" stroke="rgba(99,180,255,.28)" stroke-width="1" stroke-dasharray="4 2"/><line x1="280" y1="82" x2="280" y2="112" stroke="rgba(99,180,255,.28)" stroke-width="1" stroke-dasharray="4 2"/><line x1="330" y1="82" x2="465" y2="112" stroke="rgba(99,180,255,.28)" stroke-width="1" stroke-dasharray="4 2"/><line x1="95" y1="138" x2="85" y2="175" stroke="rgba(99,180,255,.18)" stroke-width="1"/><line x1="95" y1="138" x2="220" y2="175" stroke="rgba(99,180,255,.18)" stroke-width="1"/><line x1="280" y1="138" x2="360" y2="175" stroke="rgba(99,180,255,.18)" stroke-width="1"/><line x1="465" y1="138" x2="490" y2="175" stroke="rgba(99,180,255,.18)" stroke-width="1"/></svg></div>`,
+    `<div class="code-b"><span class="cmt">// Session state (Mnesia — distributed ETS)</span><br>Key: userId | Fields: pid, node, last_seen,<br>                      device_list, push_token<br>In-memory → microsecond lookups, no disk I/O<br><br><span class="cmt">// Message storage (offline queue)</span><br>Stored until recipient ACKs delivery<br>Deleted immediately after ACK (no persistence)<br><br><span class="cmt">// Media deduplication (SHA-256 hash)</span><br>Upload: hash → check if S3 blob exists<br>If yes → share reference (no re-upload)<br>Saves ~80% of storage costs</div>`,
+    `<div class="code-b"><span class="cmt">// Custom binary protocol over TCP/TLS (Noise)</span><br>CONNECT → phone OTP auth<br>  → Signal Double Ratchet key exchange<br>  → Device registration<br><br>SEND_MSG → encrypt locally (E2EE)<br>  → Server relays opaque ciphertext only<br>  → ACK: sent ✓ | delivered ✓✓ | read ✓✓<br><br>MEDIA_SEND → upload encrypted blob to S3<br>  → Share URL + decryption key in message<br>  → Server sees only encrypted bytes, never content</div>`,
+    `<div class="to-grid"><div class="to-box to-y"><div style="color:var(--em);font-weight:700;margin-bottom:.5rem;font-size:13.5px;">✓ What Worked</div><ul class="to-list"><li>Erlang: millions of cheap concurrent processes</li><li>E2EE by default — privacy as architecture</li><li>Media dedup cuts storage costs by ~80%</li><li>Offline queuing handles reconnects seamlessly</li><li>FreeBSD tuned: 1M connections per server</li></ul></div><div class="to-box to-n"><div style="color:var(--rose);font-weight:700;margin-bottom:.5rem;font-size:13.5px;">⚠ Challenges</div><ul class="to-list"><li>Multi-device sync complexity (linked devices)</li><li>Group messages at scale (1000 members)</li><li>Message ordering in poor network conditions</li><li>Backup encryption key management UX</li><li>Spam/abuse detection without reading messages</li></ul></div></div>`,
+  ]},
+  instagram:{name:'📸 Instagram',tabs:['Overview','Architecture','Database','API Design','Trade-offs'],
+  content:[
+    `<div class="info-grid"><div class="info-card"><div class="info-n" style="color:var(--accent2);">2B+</div><div class="info-l">Monthly Users</div></div><div class="info-card"><div class="info-n" style="color:var(--em);">100M+</div><div class="info-l">Photos/day</div></div><div class="info-card"><div class="info-n" style="color:var(--am);">500M</div><div class="info-l">Stories/day</div></div></div><p style="color:var(--text2);font-size:13.5px;line-height:1.8;margin-bottom:1rem;">Instagram launched in 2010 with 3 engineers and a Django/PostgreSQL monolith. By acquisition (2012, $1B) it had 30M users on 3 engineers. Today it's a sophisticated microservices platform on Meta's infrastructure, built primarily in Python and Cassandra.</p><ul style="color:var(--text2);font-size:13px;line-height:1.9;padding-left:1.2rem;"><li>Django (Python) monolith carefully evolved into microservices</li><li>PostgreSQL (sharded via PgBouncer) for users, follows, likes</li><li>Cassandra for feed timelines, activity data, and Stories</li><li>Redis for session data, counters, and ranked activity feeds</li><li>Apache Spark for ML-based content ranking and explore page</li></ul>`,
+    `<div class="arch-box"><svg viewBox="0 0 560 260" xmlns="http://www.w3.org/2000/svg" style="width:100%"><rect x="190" y="8" width="180" height="26" rx="6" fill="rgba(194,48,100,.14)" stroke="rgba(194,48,100,.38)" stroke-width="1"/><text x="280" y="25" fill="#f472b6" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">Instagram CDN (Meta Edge)</text><rect x="190" y="56" width="180" height="26" rx="6" fill="rgba(59,130,246,.14)" stroke="rgba(59,130,246,.38)" stroke-width="1"/><text x="280" y="73" fill="#93c5fd" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">API Gateway / Load Balancer</text><rect x="20" y="112" width="120" height="26" rx="6" fill="rgba(16,185,129,.11)" stroke="rgba(16,185,129,.32)" stroke-width="1"/><text x="80" y="129" fill="#6ee7b7" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">Feed Service</text><rect x="160" y="112" width="120" height="26" rx="6" fill="rgba(16,185,129,.11)" stroke="rgba(16,185,129,.32)" stroke-width="1"/><text x="220" y="129" fill="#6ee7b7" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">Media Service</text><rect x="300" y="112" width="120" height="26" rx="6" fill="rgba(16,185,129,.11)" stroke="rgba(16,185,129,.32)" stroke-width="1"/><text x="360" y="129" fill="#6ee7b7" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">Search & Discover</text><rect x="440" y="112" width="100" height="26" rx="6" fill="rgba(16,185,129,.11)" stroke="rgba(16,185,129,.32)" stroke-width="1"/><text x="490" y="129" fill="#6ee7b7" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">Notifications</text><rect x="20" y="175" width="110" height="24" rx="5" fill="rgba(245,158,11,.11)" stroke="rgba(245,158,11,.28)" stroke-width="1"/><text x="75" y="191" fill="#fcd34d" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Cassandra (Timeline)</text><rect x="150" y="175" width="110" height="24" rx="5" fill="rgba(245,158,11,.11)" stroke="rgba(245,158,11,.28)" stroke-width="1"/><text x="205" y="191" fill="#fcd34d" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">PostgreSQL (Users)</text><rect x="290" y="175" width="110" height="24" rx="5" fill="rgba(244,63,94,.11)" stroke="rgba(244,63,94,.28)" stroke-width="1"/><text x="345" y="191" fill="#fda4af" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Redis (Counters)</text><rect x="420" y="175" width="110" height="24" rx="5" fill="rgba(59,130,246,.11)" stroke="rgba(59,130,246,.28)" stroke-width="1"/><text x="475" y="191" fill="#93c5fd" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">S3 (Media)</text><rect x="150" y="228" width="270" height="22" rx="5" fill="rgba(139,92,246,.11)" stroke="rgba(139,92,246,.28)" stroke-width="1"/><text x="285" y="243" fill="#c4b5fd" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Apache Spark (ML Ranking)</text><line x1="280" y1="34" x2="280" y2="56" stroke="rgba(99,180,255,.38)" stroke-width="1" stroke-dasharray="4 2"/><line x1="230" y1="82" x2="80" y2="112" stroke="rgba(99,180,255,.28)" stroke-width="1" stroke-dasharray="4 2"/><line x1="260" y1="82" x2="220" y2="112" stroke="rgba(99,180,255,.28)" stroke-width="1" stroke-dasharray="4 2"/><line x1="300" y1="82" x2="360" y2="112" stroke="rgba(99,180,255,.28)" stroke-width="1" stroke-dasharray="4 2"/><line x1="330" y1="82" x2="490" y2="112" stroke="rgba(99,180,255,.28)" stroke-width="1" stroke-dasharray="4 2"/><line x1="80" y1="138" x2="75" y2="175" stroke="rgba(99,180,255,.18)" stroke-width="1"/><line x1="220" y1="138" x2="205" y2="175" stroke="rgba(99,180,255,.18)" stroke-width="1"/><line x1="360" y1="138" x2="345" y2="175" stroke="rgba(99,180,255,.18)" stroke-width="1"/><line x1="490" y1="138" x2="475" y2="175" stroke="rgba(99,180,255,.18)" stroke-width="1"/></svg></div>`,
+    `<div class="code-b"><span class="cmt">// Photo metadata (PostgreSQL sharded by owner_id)</span><br>id, owner_id, url, caption, location_id,<br>created_at, like_count, comment_count<br>Shard key: owner_id → consistent user locality<br><br><span class="cmt">// Feed / Timeline (Cassandra)</span><br>Partition: user_id | Clustering: created_at DESC<br>Fan-out-on-write for users &lt; 1M followers<br>Fan-out-on-read (pull) for celebrities<br><br><span class="cmt">// Counters (Redis, eventually synced)</span><br>INCR likes:photoId → batch flush every 60s</div>`,
+    `<div class="code-b">POST /v1/media/upload<br>  → Generate S3 presigned URL<br>  → Client uploads directly to S3<br>  → Callback → resize/filter → CDN push<br>  → Fan-out to followers' Cassandra timelines<br><br>GET /v1/feed/?maxId=:cursor<br>  → Cassandra read (cursor-based pagination)<br>  → ML re-ranking (engagement prediction)<br>  → Ad injection every 4th item<br><br>POST /v1/media/:id/like<br>  → Redis INCR (optimistic, fast)<br>  → Kafka event → fan-out notifications<br>  → Async PostgreSQL write</div>`,
+    `<div class="to-grid"><div class="to-box to-y"><div style="color:var(--em);font-weight:700;margin-bottom:.5rem;font-size:13.5px;">✓ What Worked</div><ul class="to-list"><li>Push/pull hybrid for celebrity accounts</li><li>Redis counters avoid write storms on DB</li><li>Cursor-based pagination vs OFFSET anti-pattern</li><li>S3 presigned URLs for direct client uploads</li><li>ML ranking dramatically boosted engagement</li></ul></div><div class="to-box to-n"><div style="color:var(--rose);font-weight:700;margin-bottom:.5rem;font-size:13.5px;">⚠ Challenges</div><ul class="to-list"><li>Feed consistency during follower graph updates</li><li>Celebrity post fan-out saturates workers</li><li>Stories TTL purge at 500M posts/day</li><li>Content moderation at 100M photos/day</li><li>Photo dedup across 1T+ stored images</li></ul></div></div>`,
+  ]},
+  amazon:{name:'📦 Amazon',tabs:['Overview','Architecture','Database','API Design','Trade-offs'],
+  content:[
+    `<div class="info-grid"><div class="info-card"><div class="info-n" style="color:var(--accent2);">310M</div><div class="info-l">Active Customers</div></div><div class="info-card"><div class="info-n" style="color:var(--em);">$574B</div><div class="info-l">Annual Revenue</div></div><div class="info-card"><div class="info-n" style="color:var(--am);">200+</div><div class="info-l">AWS Services</div></div></div><p style="color:var(--text2);font-size:13.5px;line-height:1.8;margin-bottom:1rem;">Amazon pioneered the "two-pizza team" microservices model before it was mainstream. Jeff Bezos's 2002 mandate — all teams must expose data and functionality only through service interfaces — became the foundation of modern microservices. AWS itself was born from their internal infrastructure needs becoming a product.</p><ul style="color:var(--text2);font-size:13px;line-height:1.9;padding-left:1.2rem;"><li>2002 Bezos API Mandate forced all teams to expose service interfaces</li><li>DynamoDB (Dynamo paper, 2007) — industry-defining eventual consistency</li><li>Amazon Aurora for relational workloads with 5x MySQL performance</li><li>Kinesis for real-time event streaming (like Kafka, fully managed)</li><li>AWS Lambda + Step Functions for serverless order processing pipelines</li></ul>`,
+    `<div class="arch-box"><svg viewBox="0 0 560 270" xmlns="http://www.w3.org/2000/svg" style="width:100%"><rect x="180" y="8" width="200" height="26" rx="6" fill="rgba(255,153,0,.14)" stroke="rgba(255,153,0,.38)" stroke-width="1"/><text x="280" y="25" fill="#fbbf24" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">Amazon CloudFront (CDN)</text><rect x="180" y="56" width="200" height="26" rx="6" fill="rgba(59,130,246,.14)" stroke="rgba(59,130,246,.38)" stroke-width="1"/><text x="280" y="73" fill="#93c5fd" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">API Gateway + Load Balancer</text><rect x="20" y="112" width="110" height="26" rx="6" fill="rgba(16,185,129,.11)" stroke="rgba(16,185,129,.32)" stroke-width="1"/><text x="75" y="129" fill="#6ee7b7" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Catalog Service</text><rect x="150" y="112" width="110" height="26" rx="6" fill="rgba(16,185,129,.11)" stroke="rgba(16,185,129,.32)" stroke-width="1"/><text x="205" y="129" fill="#6ee7b7" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Order Service</text><rect x="280" y="112" width="110" height="26" rx="6" fill="rgba(16,185,129,.11)" stroke="rgba(16,185,129,.32)" stroke-width="1"/><text x="335" y="129" fill="#6ee7b7" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Payment Service</text><rect x="420" y="112" width="110" height="26" rx="6" fill="rgba(16,185,129,.11)" stroke="rgba(16,185,129,.32)" stroke-width="1"/><text x="475" y="129" fill="#6ee7b7" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Fulfillment Svc</text><rect x="20" y="175" width="100" height="24" rx="5" fill="rgba(245,158,11,.11)" stroke="rgba(245,158,11,.28)" stroke-width="1"/><text x="70" y="191" fill="#fcd34d" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">DynamoDB</text><rect x="140" y="175" width="100" height="24" rx="5" fill="rgba(245,158,11,.11)" stroke="rgba(245,158,11,.28)" stroke-width="1"/><text x="190" y="191" fill="#fcd34d" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Amazon Aurora</text><rect x="270" y="175" width="100" height="24" rx="5" fill="rgba(244,63,94,.11)" stroke="rgba(244,63,94,.28)" stroke-width="1"/><text x="320" y="191" fill="#fda4af" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">ElastiCache</text><rect x="390" y="175" width="100" height="24" rx="5" fill="rgba(59,130,246,.11)" stroke="rgba(59,130,246,.28)" stroke-width="1"/><text x="440" y="191" fill="#93c5fd" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">S3 (Media)</text><rect x="130" y="228" width="160" height="22" rx="5" fill="rgba(139,92,246,.11)" stroke="rgba(139,92,246,.28)" stroke-width="1"/><text x="210" y="243" fill="#c4b5fd" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">Amazon Kinesis (Events)</text><rect x="310" y="228" width="160" height="22" rx="5" fill="rgba(255,153,0,.1)" stroke="rgba(255,153,0,.28)" stroke-width="1"/><text x="390" y="243" fill="#fbbf24" font-size="9" text-anchor="middle" font-family="DM Sans" font-weight="600">AWS Lambda (Serverless)</text><line x1="280" y1="34" x2="280" y2="56" stroke="rgba(99,180,255,.38)" stroke-width="1" stroke-dasharray="4 2"/><line x1="230" y1="82" x2="75" y2="112" stroke="rgba(99,180,255,.28)" stroke-width="1" stroke-dasharray="4 2"/><line x1="260" y1="82" x2="205" y2="112" stroke="rgba(99,180,255,.28)" stroke-width="1" stroke-dasharray="4 2"/><line x1="300" y1="82" x2="335" y2="112" stroke="rgba(99,180,255,.28)" stroke-width="1" stroke-dasharray="4 2"/><line x1="330" y1="82" x2="475" y2="112" stroke="rgba(99,180,255,.28)" stroke-width="1" stroke-dasharray="4 2"/><line x1="75" y1="138" x2="70" y2="175" stroke="rgba(99,180,255,.18)" stroke-width="1"/><line x1="205" y1="138" x2="190" y2="175" stroke="rgba(99,180,255,.18)" stroke-width="1"/><line x1="335" y1="138" x2="320" y2="175" stroke="rgba(99,180,255,.18)" stroke-width="1"/><line x1="475" y1="138" x2="440" y2="175" stroke="rgba(99,180,255,.18)" stroke-width="1"/></svg></div>`,
+    `<div class="code-b"><span class="cmt">// Product catalog (DynamoDB)</span><br>PK: productId | SK: sku<br>Attrs: title, price, inventory, images, categoryId<br>GSI: categoryId-price → browse by category<br><br><span class="cmt">// Orders (Amazon Aurora, Multi-AZ)</span><br>Tables: orders, order_items, payments<br>ACID transactions for order placement<br>Read replicas in 3 AZs for zero-downtime<br><br><span class="cmt">// Sessions & cart (ElastiCache Redis)</span><br>Key: cart:{sessionId} | TTL: 24h<br>Persisted to DynamoDB on checkout</div>`,
+    `<div class="code-b">POST /checkout<br>  → Validate cart (DynamoDB inventory check)<br>  → Reserve inventory (conditional write, OCC)<br>  → Charge payment (idempotent via token)<br>  → Kinesis event → Fulfillment service<br>  → Lambda: confirmation email + tracking<br><br>GET /products?category=:id&sort=price<br>  → ElastiCache → DynamoDB GSI scan<br>  → Personalization ML overlay<br>  → A/B test variant injection<br><br>GET /orders/:id/track<br>  → Aurora read → carrier API (AMZL/UPS)</div>`,
+    `<div class="to-grid"><div class="to-box to-y"><div style="color:var(--em);font-weight:700;margin-bottom:.5rem;font-size:13.5px;">✓ What Worked</div><ul class="to-list"><li>Bezos API mandate created SOA culture early</li><li>DynamoDB Dynamo paper influenced the industry</li><li>Conditional writes prevent inventory overselling</li><li>Lambda scales to zero — cuts cost on quiet periods</li><li>AWS: turning internal cost centers into revenue</li></ul></div><div class="to-box to-n"><div style="color:var(--rose);font-weight:700;margin-bottom:.5rem;font-size:13.5px;">⚠ Challenges</div><ul class="to-list"><li>Inventory consistency during flash sales</li><li>3P seller data isolation and trust boundaries</li><li>Distributed refund transaction across services</li><li>Search relevance across 350M+ product catalog</li><li>Prime Day: 10x+ normal peak — pre-scaling critical</li></ul></div></div>`,
+  ]},
+};
+
+let activeCaseId=null, activeCaseTab=0;
+function openCase(id){
+  activeCaseId=id; activeCaseTab=0;
+  document.getElementById('case-overview').style.display='none';
+  document.getElementById('case-detail').classList.add('on');
+  const c=CASES[id];
+  document.getElementById('case-title').textContent=c.name;
+  renderCaseTabs();
+}
+function renderCaseTabs(){
+  const c=CASES[activeCaseId];
+  document.getElementById('case-tabs').innerHTML=c.tabs.map((t,i)=>`<div class="dtab${i===activeCaseTab?' on':''}" onclick="setCaseTab(${i})">${t}</div>`).join('');
+  document.getElementById('case-body').innerHTML=c.content[activeCaseTab]||'';
+}
+function setCaseTab(i){activeCaseTab=i;renderCaseTabs();}
+function closeCase(){
+  document.getElementById('case-overview').style.display='block';
+  document.getElementById('case-detail').classList.remove('on');
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LEARNING HUB
+══════════════════════════════════════════════════════════════════════════*/
+const TOPICS={
+  lb:{title:'⚖️ Load Balancing',html:`
+    <h2 style="font-family:var(--fd);font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:.9rem;">Load Balancing</h2>
+    <p style="color:var(--text2);font-size:13.5px;line-height:1.8;margin-bottom:.9rem;">Load balancing distributes incoming traffic across multiple servers to prevent bottlenecks and ensure high availability. The algorithm choice significantly impacts latency, resource utilization, and session handling.</p>
+    <div class="concept-grid">
+      <div class="concept-card"><div class="concept-title" style="color:var(--accent2);">Round Robin</div><div class="concept-body">Requests distributed sequentially: A→B→C→A→B→C. Simple but ignores server capacity or current load. Best for homogeneous servers.</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--em);">Least Connections</div><div class="concept-body">Routes to the server with fewest active connections. Ideal for long-lived connections — WebSockets, database pools, streaming sessions.</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--am);">Consistent Hashing</div><div class="concept-body">hash(client_ip) → same server always. Enables session affinity without a lookup store. Used by CDNs, Redis Cluster, Cassandra for shard routing.</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--violet);">Weighted Round Robin</div><div class="concept-body">Proportional traffic by server capacity. 16-core server gets 2× traffic vs 8-core. Handles heterogeneous fleets with mixed hardware generations.</div></div>
+    </div>
+    <div class="viz-box" style="margin-top:1rem;">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:.75rem;font-family:var(--fm);">// Consistent hashing with virtual nodes (Python)</div>
+      <div class="code-b" style="margin-top:0;">ring = SortedDict() <span class="cmt"># hash → server_id</span>
+<br><span class="kw">for</span> server <span class="kw">in</span> servers:
+<br>  <span class="kw">for</span> v <span class="kw">in</span> range(150): <span class="cmt"># 150 virtual nodes per server</span>
+<br>    h = md5(f<span class="str">"{server}-{v}"</span>).hexdigest()
+<br>    ring[h] = server
+<br>
+<br><span class="kw">def</span> route(request_ip):
+<br>  h = md5(request_ip).hexdigest()
+<br>  <span class="kw">return</span> ring.ceiling_key(h) <span class="cmt"># nearest clockwise node</span></div>
+    </div>
+    <div style="margin-top:1rem;padding:1rem;background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.18);border-radius:8px;">
+      <div style="font-size:13px;font-weight:700;color:var(--accent3);margin-bottom:.4rem;">💡 Key Insight</div>
+      <div style="font-size:12.5px;color:var(--text2);line-height:1.7;">Adding/removing a server with consistent hashing only remaps <strong style="color:var(--text);">1/N of keys</strong> — vs. <strong style="color:var(--text);">all keys</strong> with modulo hashing. This is critical for zero-downtime scaling of distributed caches.</div>
+    </div>`},
+  cache:{title:'⚡ Caching Strategies',html:`
+    <h2 style="font-family:var(--fd);font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:.9rem;">Caching Strategies</h2>
+    <p style="color:var(--text2);font-size:13.5px;line-height:1.8;margin-bottom:.9rem;">Caching reduces latency and database load by serving frequently accessed data from fast storage (Redis, Memcached). Strategy choice depends on read/write ratios and consistency requirements.</p>
+    <div class="concept-grid">
+      <div class="concept-card"><div class="concept-title" style="color:var(--accent2);">Cache-Aside (Lazy)</div><div class="concept-body">App checks cache → miss → query DB → populate cache. Most common. Risk: <strong style="color:var(--text);">thundering herd</strong> on cold start — use jittered TTL to spread load.</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--em);">Write-Through</div><div class="concept-body">Writes go to cache AND database synchronously. Strong consistency but adds write latency. Good for read-heavy, write-occasional data like product catalogs.</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--am);">Write-Behind (Async)</div><div class="concept-body">Writes go to cache immediately; DB updated asynchronously. Very fast writes. Risk: data loss if cache fails before flush. Use with durable write-ahead log.</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--rose);">Read-Through</div><div class="concept-body">Cache sits transparently in front of DB. On miss, cache loads from DB automatically. Simplifies application code but less flexible than cache-aside.</div></div>
+    </div>
+    <div class="viz-box" style="margin-top:1rem;">
+      <div class="code-b" style="margin-top:0;"><span class="kw">def</span> get_user(user_id):
+<br>  key = f<span class="str">"user:{user_id}"</span>
+<br>  cached = redis.get(key)
+<br>  <span class="kw">if</span> cached: <span class="kw">return</span> json.loads(cached) <span class="cmt"># cache hit</span>
+<br>
+<br>  user = db.query(<span class="str">"SELECT * FROM users WHERE id=?"</span>, user_id)
+<br>  ttl = 3600 + random.randint(0, 600) <span class="cmt"># jitter to avoid stampede</span>
+<br>  redis.setex(key, ttl, json.dumps(user))
+<br>  <span class="kw">return</span> user</div>
+    </div>
+    <div style="margin-top:1rem;padding:1rem;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.18);border-radius:8px;">
+      <div style="font-size:13px;font-weight:700;color:var(--am);margin-bottom:.4rem;">⚠ Cache Invalidation</div>
+      <div style="font-size:12.5px;color:var(--text2);line-height:1.7;">Phil Karlton: <em style="color:var(--text);">"There are only two hard things in CS: cache invalidation and naming things."</em> Strategies: TTL expiry, event-driven invalidation via Kafka, versioned cache keys, and cache-busting on mutations.</div>
+    </div>`},
+  shard:{title:'🗃️ Database Sharding',html:`
+    <h2 style="font-family:var(--fd);font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:.9rem;">Database Sharding</h2>
+    <p style="color:var(--text2);font-size:13.5px;line-height:1.8;margin-bottom:.9rem;">Sharding (horizontal partitioning) splits a large database across multiple servers. Each shard holds a subset of rows. When a single DB can't handle the load — typically >5TB or >100K writes/sec — sharding is necessary.</p>
+    <div class="concept-grid">
+      <div class="concept-card"><div class="concept-title" style="color:var(--accent2);">Range Sharding</div><div class="concept-body">userId 1–1M → Shard 1, 1M–2M → Shard 2. Simple to reason about. Problem: hotspots — sequential IDs mean most writes hit the last shard.</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--em);">Hash Sharding</div><div class="concept-body">shard = hash(userId) % N. Even distribution eliminates hotspots. Problem: adding shards requires rehashing all keys (use consistent hashing to minimize remapping).</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--am);">Directory Sharding</div><div class="concept-body">Lookup table maps entity → shard. Maximum flexibility; can rebalance shards without rehashing. Extra latency for every request to consult the directory.</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--violet);">Geo Sharding</div><div class="concept-body">Shard by geography: EU users → EU shard, US → US shard. Reduces latency and satisfies data residency laws (GDPR). Used by Uber, Airbnb, Shopify.</div></div>
+    </div>
+    <div class="viz-box" style="margin-top:1rem;">
+      <div class="code-b" style="margin-top:0;"><span class="cmt">// Cross-shard query problem</span>
+<br><span class="cmt">// "Find all orders for user 42 in the last 7 days"</span>
+<br><span class="cmt">// If sharded by order_id, must query ALL shards:</span>
+<br>results = []
+<br><span class="kw">for</span> shard <span class="kw">in</span> all_shards:
+<br>  results += shard.query(<span class="str">"SELECT * WHERE user_id=42 AND ..."</span>)
+<br>
+<br><span class="cmt">// Solution: shard by user_id for user-centric queries</span>
+<br><span class="cmt">// Or maintain a secondary index shard for cross-shard access</span></div>
+    </div>`},
+  repl:{title:'🔄 Database Replication',html:`
+    <h2 style="font-family:var(--fd);font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:.9rem;">Database Replication</h2>
+    <p style="color:var(--text2);font-size:13.5px;line-height:1.8;margin-bottom:.9rem;">Replication maintains copies of data across multiple nodes for fault tolerance, read scaling, and geographic distribution. The core tradeoff: stronger consistency ↔ higher latency.</p>
+    <div class="concept-grid">
+      <div class="concept-card"><div class="concept-title" style="color:var(--accent2);">Leader-Follower</div><div class="concept-body">All writes → leader, async replicated to followers. Followers serve reads. Simple. Leader is SPOF. Used by: PostgreSQL streaming replication, MySQL binlog.</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--em);">Multi-Leader</div><div class="concept-body">Multiple leaders accept writes simultaneously. Requires conflict resolution (LWW, CRDTs, custom merge). Used for multi-region active-active setups.</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--am);">Leaderless (Dynamo)</div><div class="concept-body">Any node accepts reads/writes. Quorum: W + R > N guarantees overlap. No SPOF. Used by: Cassandra (W=1,R=1 → fast; W=2,R=2 → consistent), DynamoDB.</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--violet);">Sync vs Async</div><div class="concept-body">Sync: leader waits for follower ACK before confirming write. Zero data loss, higher latency (+5–50ms). Async: returns immediately, may lose recent writes on failover.</div></div>
+    </div>
+    <div style="margin-top:1rem;padding:1rem;background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.18);border-radius:8px;">
+      <div style="font-size:13px;font-weight:700;color:var(--em);margin-bottom:.4rem;">🔢 Quorum Math (Cassandra)</div>
+      <div style="font-size:12.5px;color:var(--text2);line-height:1.75;font-family:var(--fm);">N=3 replicas<br>W=2 (write to 2) + R=2 (read from 2) > N=3 ✓ → strong consistency<br>W=1 + R=1 → eventual consistency (max performance)<br>W=3 + R=1 → writes always consistent (slow writes)</div>
+    </div>`},
+  event:{title:'📨 Event-Driven Architecture',html:`
+    <h2 style="font-family:var(--fd);font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:.9rem;">Event-Driven Architecture</h2>
+    <p style="color:var(--text2);font-size:13.5px;line-height:1.8;margin-bottom:.9rem;">Event-driven systems communicate through immutable events rather than direct calls, decoupling producers from consumers. This enables independent scaling, resilience, and temporal decoupling.</p>
+    <div class="concept-grid">
+      <div class="concept-card"><div class="concept-title" style="color:var(--accent2);">Event Sourcing</div><div class="concept-body">State = replay of immutable events. Every change is stored as an event. Full audit trail, time travel debugging, temporal queries. Used in: banking, e-commerce order history.</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--em);">CQRS</div><div class="concept-body">Separate read and write models. Commands mutate state (write side). Queries read from optimized read models updated via events. Maximizes both read and write performance independently.</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--am);">Saga Pattern</div><div class="concept-body">Distributed transaction as a sequence of local transactions + compensating rollbacks. Choreography (event-driven) or Orchestration (central coordinator). Solves 2PC's blocking problem.</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--violet);">Outbox Pattern</div><div class="concept-body">Write event to an outbox table in the same DB transaction as the state change. A CDC poller (Debezium) publishes to Kafka. Guarantees exactly-once delivery without 2PC.</div></div>
+    </div>
+    <div class="viz-box" style="margin-top:1rem;">
+      <div class="code-b" style="margin-top:0;"><span class="cmt">// Kafka producer (Order Service)</span>
+<br>producer.send(topic=<span class="str">"order-events"</span>, key=order_id,
+<br>  value={<span class="str">"type"</span>:<span class="str">"ORDER_PLACED"</span>, <span class="str">"orderId"</span>:123,
+<br>         <span class="str">"userId"</span>:456, <span class="str">"items"</span>:[...], <span class="str">"total"</span>:99.99})
+<br>
+<br><span class="cmt">// Consumer (Inventory Service)</span>
+<br>@consumer(topics=[<span class="str">"order-events"</span>], group=<span class="str">"inventory"</span>)
+<br><span class="kw">def</span> handle(event):
+<br>  <span class="kw">if</span> event[<span class="str">"type"</span>] == <span class="str">"ORDER_PLACED"</span>:
+<br>    reserve_inventory(event[<span class="str">"items"</span>]) <span class="cmt"># idempotent</span></div>
+    </div>`},
+  micro:{title:'⚙️ Microservices Patterns',html:`
+    <h2 style="font-family:var(--fd);font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:.9rem;">Microservices Patterns</h2>
+    <p style="color:var(--text2);font-size:13.5px;line-height:1.8;margin-bottom:.9rem;">Microservices decompose a monolith into independently deployable services, each owning its data. The architecture introduces new challenges: resilience patterns are essential to prevent cascade failures.</p>
+    <div class="concept-grid">
+      <div class="concept-card"><div class="concept-title" style="color:var(--accent2);">Circuit Breaker</div><div class="concept-body">State machine: Closed → Open → Half-Open. On repeated failures, open the circuit: fast-fail requests with a fallback. Prevents cascade failure. Implementations: Hystrix, Resilience4j.</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--em);">Service Mesh (Istio)</div><div class="concept-body">Sidecar proxies handle mTLS, retries, timeouts, circuit breaking, and distributed tracing transparently. Services don't implement this logic. Envoy proxy is the standard sidecar.</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--am);">Saga Pattern</div><div class="concept-body">Distributed transactions via compensating actions. Choreography: services react to events. Orchestration: a Saga coordinator sends commands. Avoids distributed locks and 2PC entirely.</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--violet);">Bulkhead Pattern</div><div class="concept-body">Isolate resources (thread pools, connection pools) per downstream service. If one downstream is slow/down, it can't exhaust shared resources for other services. Named after ship hull compartments.</div></div>
+    </div>
+    <div style="margin-top:1rem;padding:1rem;background:rgba(244,63,94,.07);border:1px solid rgba(244,63,94,.18);border-radius:8px;">
+      <div style="font-size:13px;font-weight:700;color:var(--rose);margin-bottom:.4rem;">⚠ Microservices Tax</div>
+      <div style="font-size:12.5px;color:var(--text2);line-height:1.7;">Microservices add complexity: distributed tracing, service discovery, inter-service latency, data consistency, and operational overhead. Sam Newman's rule: <em style="color:var(--text);">start as a monolith, extract services when you feel the pain.</em></div>
+    </div>`},
+  dist:{title:'🌐 Distributed Systems',html:`
+    <h2 style="font-family:var(--fd);font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:.9rem;">Distributed Systems Fundamentals</h2>
+    <p style="color:var(--text2);font-size:13.5px;line-height:1.8;margin-bottom:.9rem;">Distributed systems coordinate multiple computers to appear as a unified system. Understanding fundamental impossibility theorems shapes every architectural decision at scale.</p>
+    <div class="concept-grid">
+      <div class="concept-card"><div class="concept-title" style="color:var(--accent2);">CAP Theorem</div><div class="concept-body">Can't simultaneously guarantee Consistency + Availability + Partition Tolerance. During a network partition, choose: CP (PostgreSQL, HBase — returns error) or AP (Cassandra, DynamoDB — returns stale data).</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--em);">Raft Consensus</div><div class="concept-body">Leader election + log replication. Majority quorum (⌊N/2⌋+1) required for writes. Leader handles all writes; followers replicate. Used by: etcd, CockroachDB, TiKV. Easier to understand than Paxos.</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--am);">Vector Clocks</div><div class="concept-body">Track causality without synchronized clocks. Each process maintains a vector of logical timestamps. Detect happens-before relationships and conflicting concurrent writes. Used by: Riak, DynamoDB.</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--rose);">Two-Phase Commit</div><div class="concept-body">Phase 1: coordinator asks all participants to prepare and lock resources. Phase 2: if all agree, commit; else abort. Blocking on coordinator crash. Avoid at scale — prefer Saga or Outbox pattern.</div></div>
+    </div>
+    <div style="margin-top:1rem;padding:1rem;background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.18);border-radius:8px;">
+      <div style="font-size:13px;font-weight:700;color:var(--accent3);margin-bottom:.4rem;">💡 PACELC Extension to CAP</div>
+      <div style="font-size:12.5px;color:var(--text2);line-height:1.75;">When there's no partition (normal operation): choose between <strong style="color:var(--text);">Latency vs Consistency</strong>. DynamoDB: PA/EL (available+low latency). CockroachDB: PC/EC (consistent, higher latency). Cassandra: PA/EL by default, tunable.</div>
+    </div>`},
+  auth:{title:'🔐 Auth & Security',html:`
+    <h2 style="font-family:var(--fd);font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:.9rem;">Authentication & Authorization</h2>
+    <p style="color:var(--text2);font-size:13.5px;line-height:1.8;margin-bottom:.9rem;">Modern auth must balance security, scalability, and developer experience. JWT + OAuth 2.0 are the de facto standards. At scale, stateless verification is critical to avoid auth becoming a bottleneck.</p>
+    <div class="concept-grid">
+      <div class="concept-card"><div class="concept-title" style="color:var(--accent2);">JWT (Stateless)</div><div class="concept-body">Header.Payload.Signature. Services verify tokens locally with public key — no DB round-trip. Short expiry (15min access + 7day refresh). Revocation requires a blocklist (Redis) or short TTL.</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--em);">OAuth 2.0 + OIDC</div><div class="concept-body">Authorization Code + PKCE for web/mobile. OIDC adds identity (id_token) on top of OAuth. Enables SSO across services. Use a dedicated auth server: Auth0, Keycloak, or self-hosted.</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--am);">Rate Limiting</div><div class="concept-body">Token bucket (allows bursts) or sliding window log (precise) per user/IP/API key. Redis ZADD for sliding window. Return 429 with Retry-After header. Apply at API gateway layer.</div></div>
+      <div class="concept-card"><div class="concept-title" style="color:var(--violet);">Zero Trust</div><div class="concept-body">"Never trust, always verify" — even inside the private network. mTLS between all services (via service mesh). No implicit trust from network location. Principle of least privilege enforced at API level.</div></div>
+    </div>
+    <div class="viz-box" style="margin-top:1rem;">
+      <div class="code-b" style="margin-top:0;"><span class="cmt">// JWT verification middleware</span>
+<br><span class="kw">def</span> verify_token(token: str) -> dict:
+<br>  <span class="kw">try</span>:
+<br>    payload = jwt.decode(token, PUBLIC_KEY,
+<br>                         algorithms=[<span class="str">"RS256"</span>])
+<br>    <span class="kw">if</span> payload[<span class="str">"exp"</span>] &lt; time.time():
+<br>      <span class="kw">raise</span> TokenExpiredError()
+<br>    <span class="kw">if</span> redis.get(f<span class="str">"blocklist:{payload['jti']}"</span>):
+<br>      <span class="kw">raise</span> TokenRevokedError()
+<br>    <span class="kw">return</span> payload
+<br>  <span class="kw">except</span> jwt.InvalidTokenError <span class="kw">as</span> e:
+<br>    <span class="kw">raise</span> UnauthorizedError(str(e))</div>
+    </div>`},
+};
+const ARTICLES=[
+  {t:'Consistent Hashing Explained with Animations',time:'12 min',level:'beginner',tag:'Fundamentals'},
+  {t:'How Kafka Achieves Sub-Millisecond Latency',time:'18 min',level:'deep',tag:'Event-Driven'},
+  {t:'Database Sharding: When, Why, and How',time:'22 min',level:'deep',tag:'Databases'},
+  {t:'CAP Theorem in Practice: Real-World Examples',time:'15 min',level:'beginner',tag:'Distributed'},
+  {t:'Circuit Breakers and Bulkhead Patterns',time:'10 min',level:'beginner',tag:'Resilience'},
+  {t:'Designing for 99.999% Uptime (Five Nines)',time:'28 min',level:'deep',tag:'SRE'},
+  {t:'Vector Clocks and Lamport Timestamps',time:'20 min',level:'deep',tag:'Distributed'},
+  {t:'API Gateway Patterns: A Practical Guide',time:'14 min',level:'beginner',tag:'APIs'},
+  {t:'The Dynamo Paper: Key Lessons for 2024',time:'25 min',level:'deep',tag:'Distributed'},
+  {t:'Redis Internals: How It Actually Works',time:'16 min',level:'deep',tag:'Caching'},
+  {t:'SQL vs NoSQL: Choosing the Right Database',time:'12 min',level:'beginner',tag:'Databases'},
+  {t:'gRPC vs REST: When to Use Which',time:'11 min',level:'beginner',tag:'APIs'},
+  {t:'The Outbox Pattern: Guaranteed Event Delivery',time:'14 min',level:'deep',tag:'Event-Driven'},
+  {t:'Service Mesh with Istio: A Beginner\'s Guide',time:'18 min',level:'beginner',tag:'Microservices'},
+];
+let artF='all';
+function artFilter(f,el){
+  artF=f;
+  document.querySelectorAll('#art-filter .ptab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');renderArts();
+}
+function renderArts(){
+  const filtered=ARTICLES.filter(a=>artF==='all'||a.level===artF);
+  document.getElementById('art-list').innerHTML=filtered.map((a,i)=>`
+    <div class="art-item">
+      <span class="art-num">${String(i+1).padStart(2,'0')}</span>
+      <div style="flex:1;"><div class="art-title">${a.t}</div><div style="font-size:11px;color:var(--text3);margin-top:1px;">${a.tag}</div></div>
+      <span class="art-badge">${a.level==='deep'?'Deep Dive':'Beginner'}</span>
+      <span style="font-size:11.5px;color:var(--text3);margin-left:.9rem;white-space:nowrap;">${a.time}</span>
+    </div>`).join('');
+}
+renderArts();
+
+function openTopic(id){
+  const t=TOPICS[id];if(!t)return;
+  document.getElementById('learn-main').style.display='none';
+  document.getElementById('topic-detail').classList.add('on');
+  document.getElementById('topic-body').innerHTML=t.html;
+}
+function closeTopic(){
+  document.getElementById('learn-main').style.display='block';
+  document.getElementById('topic-detail').classList.remove('on');
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   DASHBOARD
+══════════════════════════════════════════════════════════════════════════*/
+const PROGRESS=[
+  {label:'Load Balancing',pct:100,color:'var(--em)'},
+  {label:'Database Design',pct:80,color:'var(--accent)'},
+  {label:'Microservices',pct:65,color:'var(--accent)'},
+  {label:'Caching Strategies',pct:55,color:'var(--accent)'},
+  {label:'Distributed Systems',pct:40,color:'var(--am)'},
+  {label:'Event-Driven Architecture',pct:25,color:'var(--rose)'},
+  {label:'Auth & Security',pct:20,color:'var(--violet)'},
+];
+document.getElementById('prog-bars').innerHTML=PROGRESS.map(p=>`
+  <div class="prog-item">
+    <div class="prog-label"><span>${p.label}</span><span style="color:${p.color};">${p.pct}%</span></div>
+    <div class="prog-bar"><div class="prog-fill" style="width:${p.pct}%;background:${p.color};"></div></div>
+  </div>`).join('');
+
+const ACTIVITY=[
+  {ic:'📖',name:'Completed: CAP Theorem Deep Dive',time:'2 hours ago',pts:'+50 pts'},
+  {ic:'🏗️',name:'Built: E-commerce Architecture',time:'Yesterday',pts:'+120 pts'},
+  {ic:'⭐',name:'Saved: Netflix Case Study',time:'2 days ago',pts:null},
+  {ic:'🏆',name:'Earned: Distributed Systems badge',time:'3 days ago',pts:'Achievement'},
+  {ic:'📝',name:'Completed: URL Shortener Project',time:'4 days ago',pts:'+200 pts'},
+];
+document.getElementById('activity-list').innerHTML=ACTIVITY.map(a=>`
+  <div class="rec-item">
+    <div class="rec-ic">${a.ic}</div>
+    <div style="flex:1;"><div class="rec-name">${a.name}</div><div class="rec-time">${a.time}</div></div>
+    ${a.pts?`<span class="rec-pts">${a.pts}</span>`:''}
+  </div>`).join('');
+
+const BADGES=[
+  {ic:'🚀',n:'First Deploy',earned:true},{ic:'🏗️',n:'Architect',earned:true},
+  {ic:'📊',n:'Data Guru',earned:true},{ic:'🌐',n:'Distributed',earned:false},
+  {ic:'⚡',n:'Cache Master',earned:true},{ic:'🔐',n:'Security Pro',earned:false},
+  {ic:'📨',n:'Queue Expert',earned:true},{ic:'👑',n:'Top 100',earned:false},
+  {ic:'⭐',n:'Star Learner',earned:true},{ic:'🔥',n:'Streak 30d',earned:false},
+  {ic:'📖',n:'Bookworm',earned:false},{ic:'🤝',n:'Contributor',earned:false},
+];
+document.getElementById('badge-grid').innerHTML=BADGES.map(b=>`
+  <div class="badge-item${b.earned?' earned':''}">
+    <div class="badge-ic" style="opacity:${b.earned?1:.3};">${b.ic}</div>
+    <div class="badge-n">${b.n}</div>
+  </div>`).join('');
+
+function renderSavedProjs(list){
+  document.getElementById('saved-projs').innerHTML=list.map(p=>`
+  <div style="display:flex;align-items:center;gap:.9rem;padding:.6rem 0;border-bottom:1px solid var(--border);">
+    <div style="width:30px;height:30px;border-radius:7px;background:rgba(59,130,246,.14);display:flex;align-items:center;justify-content:center;font-size:13px;">⭐</div>
+    <div style="flex:1;"><div style="font-size:13.5px;font-weight:500;color:var(--text);">${p.t||p.title}</div><div style="font-size:11px;color:var(--text3);">⏱ ${p.time||p.time_estimate} · ★ ${p.stars}</div></div>
+    <button class="btn-sm" onclick="go('library')">Open →</button>
+  </div>`).join('');
+}
+renderSavedProjs(PROJECTS.slice(0,5));
+
+async function loadDashboard(){
+  if(!currentUser) return;
+  try{
+    const d = await apiFetch('/dashboard/me');
+    document.querySelector('#dashboard .dash-stats').innerHTML = `
+      <div class="dstat"><div class="dstat-n" style="color:var(--accent2);">${d.projects_completed}</div><div class="dstat-l">Architectures Saved</div></div>
+      <div class="dstat"><div class="dstat-n" style="color:var(--em);">${d.learning_progress_pct}%</div><div class="dstat-l">Learning Progress</div></div>
+      <div class="dstat"><div class="dstat-n" style="color:var(--am);">${d.badges_earned}</div><div class="dstat-l">Badges Earned</div></div>`;
+    document.getElementById('badge-grid').innerHTML=d.badges.map(b=>`
+      <div class="badge-item${b.earned?' earned':''}">
+        <div class="badge-ic" style="opacity:${b.earned?1:.3};">${b.icon}</div>
+        <div class="badge-n">${b.name}</div>
+      </div>`).join('');
+    renderSavedProjs(d.saved_projects.length ? d.saved_projects : PROJECTS.slice(0,5));
+  }catch(e){ /* keep static demo dashboard */ }
+}
+loadDashboard();
+
+/* ══════════════════════════════════════════════════════════════════════════
+   COMMUNITY
+══════════════════════════════════════════════════════════════════════════*/
+let posts=[
+  {author:'priya_sys',color:'#f59e0b',title:'How do you handle eventual consistency in microservices?',body:'Working on a distributed order system. Struggling with consistency across 5 services. Saga vs 2PC — share your experience!',likes:142,comments:38,time:'2h ago',category:'trending'},
+  {author:'arch_master',color:'#8b5cf6',title:'My journey designing a system for 10M concurrent users',body:"After 3 years at a unicorn, here's what I learned about scaling Postgres, Kafka, and Redis together. Long thread 🧵",likes:389,comments:72,time:'5h ago',category:'trending'},
+  {author:'distributed_dev',color:'#06b6d4',title:'How we cut p99 latency by 80% with smart caching',body:'Our API was at 800ms p99. After a multi-layer Redis + CDN caching strategy, now at 160ms. Full breakdown inside.',likes:256,comments:44,time:'1d ago',category:'latest'},
+  {author:'kafka_queen',color:'#10b981',title:'Kafka vs Kinesis vs Pulsar: 3-month honest comparison',body:'Tested all three at 1M events/sec for 3 months. Cost, latency, operational complexity — honest results, no sponsorship.',likes:512,comments:91,time:'2d ago',category:'trending'},
+  {author:'newbie_arch',color:'#64748b',title:'Best resources for learning system design from scratch?',body:'Just starting my system design journey. Any recommended books, courses, or projects for a complete beginner?',likes:28,comments:15,time:'3h ago',category:'latest'},
+  {author:'scale_ninja',color:'#f43f5e',title:'Hot take: shared databases in microservices are fine',body:'The complexity of DB-per-service is often not worth it for small teams. Fight me in the comments.',likes:198,comments:67,time:'6h ago',category:'trending'},
+];
+let postF='all';
+let npOpen=false;
+function setPostF(f,el){
+  postF=f;
+  document.querySelectorAll('#post-filter .ptab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');renderPosts();
+}
+function renderPosts(){
+  const filtered = postF==='all' ? posts : posts.filter(p=>p.category===postF);
+  document.getElementById('post-list').innerHTML=filtered.map((p,i)=>`
+    <div class="post">
+      <div class="post-hdr">
+        <div class="post-av" style="background:${p.color};">${p.author.slice(0,2).toUpperCase()}</div>
+        <div><div class="post-author">${p.author}</div><div class="post-time">${p.time}</div></div>
+      </div>
+      <div class="post-title">${p.title}</div>
+      <div class="post-body">${p.body}</div>
+      <div class="post-foot">
+        <span class="pact" onclick="likePost(${i},this)">❤️ <span>${p.likes}</span></span>
+        <span class="pact">💬 ${p.comments}</span>
+        <span class="pact">🔗 Share</span>
+        <span class="pact" style="margin-left:auto;" onclick="toast('Post bookmarked!')">🔖 Save</span>
+      </div>
+    </div>`).join('');
+}
+function likePost(i,el){
+  posts[i].likes++;el.querySelector('span').textContent=posts[i].likes;
+  if(posts[i].id) apiFetch(`/forum/posts/${posts[i].id}/like`, {method:'POST'}).catch(()=>{});
+}
+renderPosts();
+
+async function loadPostsFromApi(){
+  try{
+    const data = await apiFetch('/forum/posts');
+    if(Array.isArray(data)){
+      posts.length = 0;
+      const palette=['#f59e0b','#8b5cf6','#06b6d4','#10b981','#64748b','#f43f5e','#3b82f6'];
+      data.forEach((p,i)=>posts.push({
+        id:p.id, author:p.author_name, color:palette[i%palette.length], title:p.title,
+        body:p.body, likes:p.likes, comments:p.comments,
+        time:new Date(p.created_at).toLocaleString(), category:p.category
+      }));
+      renderPosts();
+    }
+  }catch(e){ /* keep static fallback data */ }
+}
+loadPostsFromApi();
+
+document.getElementById('hot-tags').innerHTML='#kafka #microservices #cap-theorem #sharding #redis #kubernetes #raft #cqrs #grpc #cassandra #dynamo #consistency'.split(' ').map(t=>`<span class="htag">${t}</span>`).join('');
+
+function toggleNewPost(){npOpen=!npOpen;document.getElementById('np-form').classList.toggle('on',npOpen);}
+async function submitPost(){
+  const title=document.getElementById('np-title').value.trim();
+  const body=document.getElementById('np-body').value.trim();
+  if(!title||!body){toast('Please fill in both the title and body.');return;}
+  if(!currentUser){ toast('Please sign in to post.'); openAuthModal('login'); return; }
+  try{
+    const p = await apiFetch('/forum/posts', {method:'POST', body:JSON.stringify({title,body})});
+    posts.unshift({id:p.id, author:p.author_name, color:'#3b82f6', title:p.title, body:p.body, likes:p.likes, comments:p.comments, time:'Just now', category:p.category});
+  }catch(e){
+    posts.unshift({author:currentUser.name,color:'#3b82f6',title,body,likes:0,comments:0,time:'Just now',category:'latest'});
+  }
+  document.getElementById('np-title').value='';
+  document.getElementById('np-body').value='';
+  toggleNewPost();
+  setPostF('all',document.querySelector('#post-filter .ptab'));
+  toast('Post published! 🎉');
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ADMIN
+══════════════════════════════════════════════════════════════════════════*/
+const MAU=[28.4,31.2,29.8,34.1,37.6,39.2,41.8,42.1];
+const MONTHS=['Nov','Dec','Jan','Feb','Mar','Apr','May','Jun'];
+const maxMAU=Math.max(...MAU);
+document.getElementById('mau-chart').innerHTML=MAU.map((v,i)=>`<div class="bar" title="${v}K users" style="height:${Math.round(v/maxMAU*68)}px;background:${i===MAU.length-1?'var(--accent)':'rgba(59,130,246,0.38)'};" onclick="toast('${MONTHS[i]}: ${v}K active users')"></div>`).join('');
+document.getElementById('mau-lbl').innerHTML=`<div style="display:flex;justify-content:space-between;width:100%;">${MONTHS.map(m=>`<span>${m}</span>`).join('')}</div>`;
+
+const CATS=[{l:'Beginner',n:89,c:'var(--em)'},{l:'Intermediate',n:78,c:'var(--accent2)'},{l:'Advanced',n:52,c:'var(--am)'},{l:'Enterprise',n:28,c:'var(--violet)'}];
+document.getElementById('cat-bars').innerHTML=CATS.map(c=>`
+  <div style="margin-bottom:.85rem;">
+    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;color:var(--text2);"><span>${c.l}</span><span style="color:${c.c};font-weight:700;">${c.n}</span></div>
+    <div style="height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;"><div style="height:100%;width:${Math.round(c.n/89*100)}%;background:${c.c};border-radius:3px;"></div></div>
+  </div>`).join('');
+
+const ADMIN_USERS=[
+  {name:'Arjun Kumar',email:'arjun@example.com',joined:'Jun 1, 2025',projects:23,status:'active'},
+  {name:'Sarah Lin',email:'sarah@example.com',joined:'May 28, 2025',projects:18,status:'active'},
+  {name:'Marcus Okafor',email:'marcus@example.com',joined:'May 15, 2025',projects:31,status:'active'},
+  {name:'Priya Sharma',email:'priya@example.com',joined:'May 10, 2025',projects:8,status:'pending'},
+  {name:'Luca Ferreira',email:'luca@example.com',joined:'Apr 22, 2025',projects:0,status:'inactive'},
+  {name:'Yuki Tanaka',email:'yuki@example.com',joined:'Apr 18, 2025',projects:14,status:'active'},
+  {name:'Amara Osei',email:'amara@example.com',joined:'Apr 5, 2025',projects:27,status:'active'},
+];
+const statusClass={active:'pill-a',pending:'pill-p',inactive:'pill-i'};
+document.getElementById('users-tb').innerHTML=ADMIN_USERS.map(u=>`
+  <tr>
+    <td style="font-weight:500;">${u.name}</td>
+    <td style="color:var(--text3);">${u.email}</td>
+    <td>${u.joined}</td><td>${u.projects}</td>
+    <td><span class="pill ${statusClass[u.status]}">${u.status}</span></td>
+    <td><button class="btn-sm" onclick="toast('Editing ${u.name}…')">Edit</button></td>
+  </tr>`).join('');
+
+const ADMIN_PROJS=[
+  {t:'URL Shortener',l:'Advanced',a:'arch_master',v:'18.4k',r:'4.8',s:'active'},
+  {t:'Real-time Chat',l:'Intermediate',a:'priya_sys',v:'14.2k',r:'4.7',s:'active'},
+  {t:'Rate Limiter',l:'Beginner',a:'distributed_dev',v:'22.1k',r:'4.6',s:'active'},
+  {t:'Global CDN Design',l:'Enterprise',a:'kafka_queen',v:'6.3k',r:'5.0',s:'pending'},
+  {t:'Payment Gateway',l:'Enterprise',a:'arch_master',v:'8.9k',r:'4.9',s:'active'},
+  {t:'Web Crawler',l:'Advanced',a:'scale_ninja',v:'8.4k',r:'4.7',s:'active'},
+  {t:'Distributed ID Generator',l:'Beginner',a:'newbie_arch',v:'25.4k',r:'4.7',s:'active'},
+];
+const tagCls={Advanced:'t-a',Intermediate:'t-i',Beginner:'t-b',Enterprise:'t-e'};
+function renderAdminProjTb(rows){
+  document.getElementById('proj-tb').innerHTML=rows.map(p=>`
+  <tr>
+    <td style="font-weight:500;">${p.t}</td>
+    <td><span class="tag ${tagCls[p.l]||'t-i'}" style="margin-bottom:0;">${p.l}</span></td>
+    <td>${p.a}</td><td>${p.v}</td><td>★ ${p.r}</td>
+    <td><span class="pill ${p.s==='active'?'pill-a':'pill-p'}">${p.s}</span></td>
+    <td><button class="btn-sm" onclick="toast('Editing ${p.t}…')">Edit</button></td>
+  </tr>`).join('');
+}
+renderAdminProjTb(ADMIN_PROJS.map(p=>({t:p.t,l:p.l.toLowerCase(),a:p.a,v:p.v,r:p.r,s:p.s})));
+
+async function loadAdmin(){
+  if(!currentUser || currentUser.role!=='admin') return;
+  try{
+    const stats = await apiFetch('/admin/stats');
+    document.querySelectorAll('#admin .astat-n')[0].textContent = stats.total_users.toLocaleString();
+    document.querySelectorAll('#admin .astat-n')[1].textContent = stats.active_projects;
+    const users = await apiFetch('/admin/users');
+    document.getElementById('users-tb').innerHTML = users.map(u=>`
+      <tr>
+        <td style="font-weight:500;">${u.name}</td>
+        <td style="color:var(--text3);">${u.email}</td>
+        <td>${new Date(u.created_at).toLocaleDateString()}</td><td>${u.points}</td>
+        <td><span class="pill ${statusClass[u.status]||'pill-a'}">${u.status}</span></td>
+        <td><button class="btn-sm" onclick="toast('Editing ${u.name}…')">Edit</button></td>
+      </tr>`).join('');
+    const projs = await apiFetch('/admin/projects');
+    renderAdminProjTb(projs.map(p=>({t:p.title,l:p.level,a:p.author,v:formatViews(p.views),r:p.stars,s:p.status})));
+  }catch(e){ /* keep static demo admin data */ }
+}
+loadAdmin();
+</script>
+</body>
+</html>
