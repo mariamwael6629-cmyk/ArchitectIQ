@@ -1,0 +1,19 @@
+/* ═══ RESPONSIVE ══════════════════════════════════════════════════════════════ */
+@media(max-width:860px){
+  .hero-grid,.feat-grid,.builder-layout,.comm-grid{grid-template-columns:1fr;}
+  .stats-strip,.case-grid,.testi-grid,.admin-stats{grid-template-columns:repeat(2,1fr);}
+  .dash-stats,.badge-grid{grid-template-columns:1fr 1fr;}
+  .hero-h1{font-size:2.2rem;}
+  .nav-link:not(.nav-cta){display:none;}
+  .nav-mobile{display:block;}
+  .info-grid{grid-template-columns:repeat(3,1fr);}
+}
+@media(max-width:520px){
+  .stats-strip,.admin-stats{grid-template-columns:1fr 1fr;}
+  .case-grid{grid-template-columns:repeat(2,1fr);}
+  .info-grid,.to-grid{grid-template-columns:1fr;}
+}
+/* Mobile nav overlay */
+.mobile-nav{display:none;position:fixed;top:58px;left:0;right:0;background:var(--bg2);border-bottom:1px solid var(--border);z-index:199;padding:1rem;flex-direction:column;gap:.35rem;}
+.mobile-nav.on{display:flex;}
+.mobile-nav .nav-link{text-align:left;padding:8px 12px;}

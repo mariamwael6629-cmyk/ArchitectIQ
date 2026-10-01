@@ -34,7 +34,7 @@ ArchitectIQ is a premium, interactive educational ecosystem designed for softwar
 
 ## 🛠️ Tech Stack
 
-* **Frontend:** Single static HTML file (`architectiq.html`) — vanilla JS/CSS, no build step, no framework. All pages (Library, Builder, Learning Hub, Community, Dashboard, Admin) are client-side rendered.
+* **Frontend:** Static HTML entry point (`architectiq.html`) with `css/` and `js/` folders — vanilla JS/CSS, no build step, no framework. All pages (Library, Builder, Learning Hub, Community, Dashboard, Admin) are client-side rendered.
 * **Backend:** Python, FastAPI + SQLAlchemy, SQLite (file-based, no separate DB server). JWT auth (`python-jose`) with bcrypt password hashing (`passlib`). Layered as `core/` (config, security, auth deps) → `models/` → `schemas/` → `routers/`, assembled in `backend/app/main.py`.
 * **API docs:** Auto-generated interactive Swagger UI and ReDoc at `/docs` / `/redoc` once the backend is running.
 * **Resilience:** The frontend works fully standalone with built-in demo data — every API call degrades gracefully to local/static state if the backend is unreachable.
@@ -84,7 +84,12 @@ CORS origins are configured via `CORS_ORIGINS` in `backend/.env` (comma-separate
 
 ```
 architectiq/
-├── architectiq.html      # Entire frontend: HTML/CSS/JS, single file
+├── architectiq.html      # Frontend entry point (markup for every page)
+├── css/                  # tokens, nav, components, pages/*, animations, responsive
+├── js/
+│   ├── core/             # api client + session, navigation, toast
+│   ├── features/         # auth modal
+│   └── pages/            # library, builder, case-studies, learning-hub, dashboard, community, admin
 ├── backend/
 │   ├── app/
 │   │   ├── core/          # config, JWT/password security, auth dependencies

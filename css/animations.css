@@ -1,0 +1,12 @@
+/* ═══ ANIMATIONS ══════════════════════════════════════════════════════════════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes flow{0%{stroke-dashoffset:20;}100%{stroke-dashoffset:0;}}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.flow-line{stroke-dasharray:5 3;animation:flow 2s linear infinite;}
+.pulse-dot{animation:pulse 2s ease-in-out infinite;}
+.fade-up{animation:fadeUp .5s ease both;}
+
+/* ═══ TOASTS ══════════════════════════════════════════════════════════════════ */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r8);padding:.9rem 1.25rem;font-size:13px;color:var(--text);z-index:999;animation:slideIn .25s ease;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.5);}

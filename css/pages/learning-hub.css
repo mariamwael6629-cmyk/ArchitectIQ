@@ -1,0 +1,20 @@
+/* ═══ LEARNING HUB ════════════════════════════════════════════════════════════ */
+.topics-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(218px,1fr));gap:1rem;margin-top:1.75rem;}
+.topic-card{background:var(--glass2);border:1px solid var(--border);border-radius:var(--r12);padding:1.2rem;cursor:pointer;transition:all .25s;}
+.topic-card:hover{border-color:var(--accent2);transform:translateY(-3px);}
+.topic-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;margin-bottom:.85rem;}
+.topic-title{font-family:var(--fd);font-size:.88rem;font-weight:700;color:#fff;margin-bottom:.3rem;}
+.topic-desc{font-size:11.5px;color:var(--text2);line-height:1.55;}
+.topic-detail{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r16);padding:1.75rem;margin-top:1.5rem;display:none;animation:fadeUp .35s ease;}
+.topic-detail.on{display:block;}
+.art-item{background:var(--glass2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.35rem;margin-bottom:.6rem;display:flex;align-items:center;gap:1.25rem;cursor:pointer;transition:all .18s;}
+.art-item:hover{border-color:var(--border2);}
+.art-num{font-family:var(--fm);font-size:11px;color:var(--text3);min-width:26px;}
+.art-title{font-weight:600;color:var(--text);flex:1;font-size:13.5px;}
+.art-badge{font-size:11px;color:var(--accent3);background:rgba(59,130,246,.1);padding:2px 8px;border-radius:100px;white-space:nowrap;}
+/* Visual diagrams */
+.viz-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:1.25rem;margin-top:1rem;}
+.concept-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem;margin-top:.85rem;}
+.concept-card{background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:1rem;}
+.concept-title{font-size:13px;font-weight:700;margin-bottom:.35rem;}
+.concept-body{font-size:12px;color:var(--text2);line-height:1.65;}
