@@ -89,7 +89,7 @@ function clearSelNodes(){document.querySelectorAll('.placed.sel').forEach(n=>n.c
 
 function renderEdges(){
   const svg=document.getElementById('canvas-svg');
-  svg.innerHTML='<defs><marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="rgba(99,180,255,0.55)"/></marker></defs>';
+  svg.innerHTML='<defs><marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="rgba(218,78,62,0.55)"/></marker></defs>';
   edges.forEach(e=>{
     const na=nodes.find(n=>n.id===e.a);
     const nb=nodes.find(n=>n.id===e.b);
@@ -104,7 +104,7 @@ function renderEdges(){
     const line=document.createElementNS('http://www.w3.org/2000/svg','line');
     line.setAttribute('x1',x1);line.setAttribute('y1',y1);
     line.setAttribute('x2',x2);line.setAttribute('y2',y2);
-    line.setAttribute('stroke','rgba(99,180,255,0.45)');
+    line.setAttribute('stroke','rgba(218,78,62,0.45)');
     line.setAttribute('stroke-width','1.5');
     line.setAttribute('stroke-dasharray','5 3');
     line.setAttribute('marker-end','url(#ah)');

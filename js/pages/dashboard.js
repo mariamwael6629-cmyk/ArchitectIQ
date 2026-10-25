@@ -49,7 +49,7 @@ document.getElementById('badge-grid').innerHTML=BADGES.map(b=>`
 function renderSavedProjs(list){
   document.getElementById('saved-projs').innerHTML=list.map(p=>`
   <div style="display:flex;align-items:center;gap:.9rem;padding:.6rem 0;border-bottom:1px solid var(--border);">
-    <div style="width:30px;height:30px;border-radius:7px;background:rgba(59,130,246,.14);display:flex;align-items:center;justify-content:center;font-size:13px;">⭐</div>
+    <div style="width:30px;height:30px;border-radius:7px;background:rgba(218,78,62,.14);display:flex;align-items:center;justify-content:center;font-size:13px;">⭐</div>
     <div style="flex:1;"><div style="font-size:13.5px;font-weight:500;color:var(--text);">${p.t||p.title}</div><div style="font-size:11px;color:var(--text3);">⏱ ${p.time||p.time_estimate} · ★ ${p.stars}</div></div>
     <button class="btn-sm" onclick="go('library')">Open →</button>
   </div>`).join('');

@@ -16,7 +16,7 @@
 .badge-n{font-size:10.5px;font-weight:600;color:var(--text3);}
 .rec-item{display:flex;align-items:center;gap:.85rem;padding:.65rem 0;border-bottom:1px solid var(--border);}
 .rec-item:last-child{border-bottom:none;}
-.rec-ic{width:33px;height:33px;border-radius:8px;background:rgba(59,130,246,.14);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.rec-ic{width:33px;height:33px;border-radius:8px;background:rgba(218,78,62,.14);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
 .rec-name{font-size:13.5px;font-weight:500;color:var(--text);}
 .rec-time{font-size:11px;color:var(--text3);}
-.rec-pts{font-size:11px;color:var(--em);background:rgba(16,185,129,.1);padding:2px 8px;border-radius:100px;white-space:nowrap;}
+.rec-pts{font-size:11px;color:var(--em);background:rgba(169,46,32,.1);padding:2px 8px;border-radius:100px;white-space:nowrap;}

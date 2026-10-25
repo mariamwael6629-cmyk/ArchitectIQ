@@ -6,7 +6,7 @@
 const MAU=[28.4,31.2,29.8,34.1,37.6,39.2,41.8,42.1];
 const MONTHS=['Nov','Dec','Jan','Feb','Mar','Apr','May','Jun'];
 const maxMAU=Math.max(...MAU);
-document.getElementById('mau-chart').innerHTML=MAU.map((v,i)=>`<div class="bar" title="${v}K users" style="height:${Math.round(v/maxMAU*68)}px;background:${i===MAU.length-1?'var(--accent)':'rgba(59,130,246,0.38)'};" onclick="toast('${MONTHS[i]}: ${v}K active users')"></div>`).join('');
+document.getElementById('mau-chart').innerHTML=MAU.map((v,i)=>`<div class="bar" title="${v}K users" style="height:${Math.round(v/maxMAU*68)}px;background:${i===MAU.length-1?'var(--accent)':'rgba(218,78,62,0.38)'};" onclick="toast('${MONTHS[i]}: ${v}K active users')"></div>`).join('');
 document.getElementById('mau-lbl').innerHTML=`<div style="display:flex;justify-content:space-between;width:100%;">${MONTHS.map(m=>`<span>${m}</span>`).join('')}</div>`;
 
 const CATS=[{l:'Beginner',n:89,c:'var(--em)'},{l:'Intermediate',n:78,c:'var(--accent2)'},{l:'Advanced',n:52,c:'var(--am)'},{l:'Enterprise',n:28,c:'var(--violet)'}];

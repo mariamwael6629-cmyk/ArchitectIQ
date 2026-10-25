@@ -25,7 +25,7 @@ const TOPICS={
 <br>  h = md5(request_ip).hexdigest()
 <br>  <span class="kw">return</span> ring.ceiling_key(h) <span class="cmt"># nearest clockwise node</span></div>
     </div>
-    <div style="margin-top:1rem;padding:1rem;background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.18);border-radius:8px;">
+    <div style="margin-top:1rem;padding:1rem;background:rgba(218,78,62,.07);border:1px solid rgba(218,78,62,.18);border-radius:8px;">
       <div style="font-size:13px;font-weight:700;color:var(--accent3);margin-bottom:.4rem;">💡 Key Insight</div>
       <div style="font-size:12.5px;color:var(--text2);line-height:1.7;">Adding/removing a server with consistent hashing only remaps <strong style="color:var(--text);">1/N of keys</strong> — vs. <strong style="color:var(--text);">all keys</strong> with modulo hashing. This is critical for zero-downtime scaling of distributed caches.</div>
     </div>`},
@@ -82,7 +82,7 @@ const TOPICS={
       <div class="concept-card"><div class="concept-title" style="color:var(--am);">Leaderless (Dynamo)</div><div class="concept-body">Any node accepts reads/writes. Quorum: W + R > N guarantees overlap. No SPOF. Used by: Cassandra (W=1,R=1 → fast; W=2,R=2 → consistent), DynamoDB.</div></div>
       <div class="concept-card"><div class="concept-title" style="color:var(--violet);">Sync vs Async</div><div class="concept-body">Sync: leader waits for follower ACK before confirming write. Zero data loss, higher latency (+5–50ms). Async: returns immediately, may lose recent writes on failover.</div></div>
     </div>
-    <div style="margin-top:1rem;padding:1rem;background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.18);border-radius:8px;">
+    <div style="margin-top:1rem;padding:1rem;background:rgba(169,46,32,.07);border:1px solid rgba(169,46,32,.18);border-radius:8px;">
       <div style="font-size:13px;font-weight:700;color:var(--em);margin-bottom:.4rem;">🔢 Quorum Math (Cassandra)</div>
       <div style="font-size:12.5px;color:var(--text2);line-height:1.75;font-family:var(--fm);">N=3 replicas<br>W=2 (write to 2) + R=2 (read from 2) > N=3 ✓ → strong consistency<br>W=1 + R=1 → eventual consistency (max performance)<br>W=3 + R=1 → writes always consistent (slow writes)</div>
     </div>`},
@@ -129,7 +129,7 @@ const TOPICS={
       <div class="concept-card"><div class="concept-title" style="color:var(--am);">Vector Clocks</div><div class="concept-body">Track causality without synchronized clocks. Each process maintains a vector of logical timestamps. Detect happens-before relationships and conflicting concurrent writes. Used by: Riak, DynamoDB.</div></div>
       <div class="concept-card"><div class="concept-title" style="color:var(--rose);">Two-Phase Commit</div><div class="concept-body">Phase 1: coordinator asks all participants to prepare and lock resources. Phase 2: if all agree, commit; else abort. Blocking on coordinator crash. Avoid at scale — prefer Saga or Outbox pattern.</div></div>
     </div>
-    <div style="margin-top:1rem;padding:1rem;background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.18);border-radius:8px;">
+    <div style="margin-top:1rem;padding:1rem;background:rgba(218,78,62,.07);border:1px solid rgba(218,78,62,.18);border-radius:8px;">
       <div style="font-size:13px;font-weight:700;color:var(--accent3);margin-bottom:.4rem;">💡 PACELC Extension to CAP</div>
       <div style="font-size:12.5px;color:var(--text2);line-height:1.75;">When there's no partition (normal operation): choose between <strong style="color:var(--text);">Latency vs Consistency</strong>. DynamoDB: PA/EL (available+low latency). CockroachDB: PC/EC (consistent, higher latency). Cassandra: PA/EL by default, tunable.</div>
     </div>`},
