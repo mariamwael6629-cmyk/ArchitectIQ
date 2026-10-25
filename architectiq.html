@@ -288,6 +288,22 @@ tr:hover td{background:rgba(27,29,33,0.03);}
   .nav-mobile{display:block;}
   .info-grid{grid-template-columns:repeat(3,1fr);}
 }
+/* Inline multi-column grids (dashboard, admin) stack on phones. */
+@media(max-width:600px){[style*="grid-template-columns:1fr 1fr"],[style*="grid-template-columns:repeat(3"],[style*="grid-template-columns:repeat(4"],[style*="grid-template-columns:2fr 1fr"]{grid-template-columns:minmax(0,1fr)!important;}}
+/* Builder on phones: the component list becomes one swipeable row above the
+   canvas; tap a component to place it, then drag nodes with a finger. */
+@media(max-width:860px){
+  .palette{display:flex;align-items:center;gap:6px;overflow-x:auto;padding:.6rem;scroll-snap-type:x proximity;}
+  .pal-sec{display:none;}
+  .palette .btn-sm{width:auto!important;flex:none;margin:0!important;white-space:nowrap;}
+  .canvas-bar{flex-wrap:nowrap!important;overflow-x:auto;}
+  .canvas-bar > *{flex:none;}
+  .comp-btn{width:auto;flex:none;margin:0;white-space:nowrap;scroll-snap-align:start;}
+  .canvas-wrap{min-height:440px;}
+  .builder-layout{grid-template-columns:minmax(0,1fr)!important;}
+  .builder-layout > *{min-width:0;}
+}
+.placed{touch-action:none;}
 @media(max-width:520px){
   .stats-strip,.admin-stats{grid-template-columns:1fr 1fr;}
   .case-grid{grid-template-columns:repeat(2,1fr);}
@@ -975,10 +991,17 @@ loadProjectsFromApi();
 ══════════════════════════════════════════════════════════════════════════*/
 let nodes=[], edges=[], dragData=null, connMode=false, connFirst=null, nodeSeq=0;
 
-// Drag from palette
+// Drag from palette, or tap to place (touch screens have no HTML drag and drop)
 document.querySelectorAll('.comp-btn[draggable]').forEach(btn=>{
   btn.addEventListener('dragstart',e=>{
     dragData={c:btn.dataset.c, e:btn.dataset.e};
+  });
+  btn.addEventListener('click',()=>{
+    const r=bcanvas.getBoundingClientRect();
+    const i=nodes.length;
+    const cols=Math.max(1,Math.floor((r.width-20)/130));
+    const top=(bcanvas.querySelector('.canvas-bar')?.offsetHeight||44)+12;
+    addNode(btn.dataset.c, btn.dataset.e, 12+(i%cols)*130, top+Math.floor(i/cols)*64);
   });
 });
 
@@ -1010,14 +1033,14 @@ function addNode(name,emoji,x,y){
 
 function makeDraggable(el, id){
   let sx,sy,moving=false;
-  el.addEventListener('mousedown',e=>{
+  el.addEventListener('pointerdown',e=>{
     if(e.target.classList.contains('del'))return;
     if(connMode){handleConnClick(id);return;}
     e.preventDefault();
     sx=e.clientX-el.offsetLeft; sy=e.clientY-el.offsetTop;
     moving=true;
-    document.addEventListener('mousemove',mm);
-    document.addEventListener('mouseup',mu);
+    document.addEventListener('pointermove',mm);
+    document.addEventListener('pointerup',mu);
   });
   function mm(e){
     if(!moving)return;
@@ -1028,7 +1051,7 @@ function makeDraggable(el, id){
     if(n){n.x=nx;n.y=ny;}
     renderEdges();
   }
-  function mu(){moving=false;document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);}
+  function mu(){moving=false;document.removeEventListener('pointermove',mm);document.removeEventListener('pointerup',mu);}
 }
 
 function handleConnClick(id){
