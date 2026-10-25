@@ -8,7 +8,7 @@ let posts=[
   {author:'arch_master',color:'#DA4E3E',title:'My journey designing a system for 10M concurrent users',body:"After 3 years at a unicorn, here's what I learned about scaling Postgres, Kafka, and Redis together. Long thread 🧵",likes:389,comments:72,time:'5h ago',category:'trending'},
   {author:'distributed_dev',color:'#B73223',title:'How we cut p99 latency by 80% with smart caching',body:'Our API was at 800ms p99. After a multi-layer Redis + CDN caching strategy, now at 160ms. Full breakdown inside.',likes:256,comments:44,time:'1d ago',category:'latest'},
   {author:'kafka_queen',color:'#A92E20',title:'Kafka vs Kinesis vs Pulsar: 3-month honest comparison',body:'Tested all three at 1M events/sec for 3 months. Cost, latency, operational complexity — honest results, no sponsorship.',likes:512,comments:91,time:'2d ago',category:'trending'},
-  {author:'newbie_arch',color:'#867869',title:'Best resources for learning system design from scratch?',body:'Just starting my system design journey. Any recommended books, courses, or projects for a complete beginner?',likes:28,comments:15,time:'3h ago',category:'latest'},
+  {author:'newbie_arch',color:'#7C7673',title:'Best resources for learning system design from scratch?',body:'Just starting my system design journey. Any recommended books, courses, or projects for a complete beginner?',likes:28,comments:15,time:'3h ago',category:'latest'},
   {author:'scale_ninja',color:'#f43f5e',title:'Hot take: shared databases in microservices are fine',body:'The complexity of DB-per-service is often not worth it for small teams. Fight me in the comments.',likes:198,comments:67,time:'6h ago',category:'trending'},
 ];
 let postF='all';
@@ -47,7 +47,7 @@ async function loadPostsFromApi(){
     const data = await apiFetch('/forum/posts');
     if(Array.isArray(data)){
       posts.length = 0;
-      const palette=['#D36A2D','#DA4E3E','#B73223','#A92E20','#867869','#f43f5e','#DA4E3E'];
+      const palette=['#D36A2D','#DA4E3E','#B73223','#A92E20','#7C7673','#f43f5e','#DA4E3E'];
       data.forEach((p,i)=>posts.push({
         id:p.id, author:p.author_name, color:palette[i%palette.length], title:p.title,
         body:p.body, likes:p.likes, comments:p.comments,

@@ -23,4 +23,4 @@
 .to-n{background:rgba(244,63,94,.07);border:1px solid rgba(244,63,94,.18);}
 .to-list{font-size:12.5px;color:var(--text2);line-height:1.75;padding-left:1.1rem;}
 .code-b{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:.9rem 1rem;font-family:var(--fm);font-size:12px;color:#DA4E3E;line-height:1.72;overflow-x:auto;margin-top:.85rem;}
-.kw{color:#DA4E3E;}.str{color:#DA4E3E;}.cmt{color:#73675B;font-style:italic;}
+.kw{color:#DA4E3E;}.str{color:#DA4E3E;}.cmt{color:#6B6663;font-style:italic;}

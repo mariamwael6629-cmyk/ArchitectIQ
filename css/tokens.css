@@ -1,11 +1,11 @@
 /* ═══ TOKENS ═══════════════════════════════════════════════════════════════ */
 :root {
-  --bg:#0D0C0B; --bg2:#181613; --bg3:#1F1C18; --bg4:#26221E; --bg5:#401E1A;
-  --glass:rgba(31,28,24,0.75); --glass2:rgba(40,36,32,0.55);
+  --bg:#0C0C0C; --bg2:#161515; --bg3:#1D1B1A; --bg4:#232221; --bg5:#401E1A;
+  --glass:rgba(29,27,26,0.75); --glass2:rgba(37,36,35,0.55);
   --border:rgba(218,78,62,0.10); --border2:rgba(218,78,62,0.22);
   --accent:#DA4E3E; --accent2:#DA4E3E; --accent3:#DA4E3E;
   --cyan:#B73223; --em:#A92E20; --am:#D36A2D; --rose:#f43f5e; --violet:#DA4E3E;
-  --text:#EEECEA; --text2:#B1A69B; --text3:#63584D;
+  --text:#EDECEB; --text2:#AAA5A2; --text3:#5C5754;
   --fd:'Syne',sans-serif; --fb:'DM Sans',sans-serif; --fm:'DM Mono',monospace;
   --r8:8px; --r12:12px; --r16:16px;
 }

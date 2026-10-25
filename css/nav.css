@@ -1,5 +1,5 @@
 /* ═══ NAV ═══════════════════════════════════════════════════════════════════ */
-#nav{position:fixed;top:0;left:0;right:0;z-index:200;height:58px;display:flex;align-items:center;padding:0 1.5rem;gap:.5rem;background:rgba(13,12,11,0.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);}
+#nav{position:fixed;top:0;left:0;right:0;z-index:200;height:58px;display:flex;align-items:center;padding:0 1.5rem;gap:.5rem;background:rgba(12,12,12,0.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);}
 .nav-brand{font-family:var(--fd);font-weight:800;font-size:1.15rem;cursor:pointer;color:#fff;margin-right:.5rem;}
 .nav-brand b{-webkit-text-fill-color: currentColor; color: var(--accent);}
 .nav-link{color:var(--text2);font-size:12.5px;font-weight:500;padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .18s;white-space:nowrap;border:none;background:none;}
