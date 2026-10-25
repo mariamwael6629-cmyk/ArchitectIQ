@@ -49,7 +49,7 @@ const TOPICS={
 <br>  redis.setex(key, ttl, json.dumps(user))
 <br>  <span class="kw">return</span> user</div>
     </div>
-    <div style="margin-top:1rem;padding:1rem;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.18);border-radius:8px;">
+    <div style="margin-top:1rem;padding:1rem;background:rgba(211,106,45,.07);border:1px solid rgba(211,106,45,.18);border-radius:8px;">
       <div style="font-size:13px;font-weight:700;color:var(--am);margin-bottom:.4rem;">⚠ Cache Invalidation</div>
       <div style="font-size:12.5px;color:var(--text2);line-height:1.7;">Phil Karlton: <em style="color:var(--text);">"There are only two hard things in CS: cache invalidation and naming things."</em> Strategies: TTL expiry, event-driven invalidation via Kafka, versioned cache keys, and cache-busting on mutations.</div>
     </div>`},
